@@ -1,28 +1,48 @@
 ---
 Language:        Cpp
 # BasedOnStyle:  LLVM
+
 AlignAfterOpenBracket: Align
+
 AlignArrayOfStructures: None
+
 AlignConsecutiveMacros: None
+
 AlignConsecutiveAssignments: None
+
 AlignConsecutiveBitFields: None
+
 AlignConsecutiveDeclarations: None
+
 AlignEscapedNewlines: Right
+
 AlignOperands:   Align
+
 AlignTrailingComments: true
+# Section 1.2a Line Widths
 AllowAllArgumentsOnNextLine: true
+# Section 1.2a Line Widths
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortEnumsOnASingleLine: true
+# Section 3.3a Blank Lines
+AllowShortEnumsOnASingleLine: false
+# Section 3.3a Blank Lines
 AllowShortBlocksOnASingleLine: Never
+# Section 3.3a Blank Lines
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: All
-AllowShortLambdasOnASingleLine: All
+# Section 3.3a Blank Lines
+AllowShortFunctionsOnASingleLine: Never
+# Section 3.3a Blank Lines
+AllowShortLambdasOnASingleLine: None
+# Section 3.3a Blank Lines
 AllowShortIfStatementsOnASingleLine: Never
+# Section 3.3a Blank Lines
 AllowShortLoopsOnASingleLine: false
+# Deprecated Kept for Backwards Compatibility
 AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakAfterReturnType: None
+# Section 3.3a Blank Lines
+AlwaysBreakAfterReturnType: AllDefinitions
+# Section 3.4c Indentation
 AlwaysBreakBeforeMultilineStrings: false
-AlwaysBreakTemplateDeclarations: MultiLine
 # Section 3.3a Blank Lines
 BinPackArguments: false
 # Section 3.3a Blank Lines
