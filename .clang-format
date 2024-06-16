@@ -64,19 +64,20 @@ CommentPragmas:  '^ IWYU pragma:'
 QualifierAlignment: Leave
 CompactNamespaces: false
 ConstructorInitializerIndentWidth: 4
+
 ContinuationIndentWidth: 4
-Cpp11BracedListStyle: true
+# Analyze for the most used line endings. 
 DeriveLineEnding: true
+# Optional Rule to analyze and format * and & 
 DerivePointerAlignment: false
+# Used to disable formatting completely in this file
 DisableFormat:   false
+# Section 3.3 Blank Lines
 EmptyLineAfterAccessModifier: Never
+# Section 3.3 Blank Lines
 EmptyLineBeforeAccessModifier: LogicalBlock
-ExperimentalAutoDetectBinPacking: false
-PackConstructorInitializers: BinPack
 BasedOnStyle:    ''
-ConstructorInitializerAllOnOneLineOrOnePerLine: false
-AllowAllConstructorInitializersOnNextLine: true
-FixNamespaceComments: true
+# No Rule is REGEX for sorting the #include block
 IncludeBlocks:   Preserve
 IncludeCategories:
   - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
@@ -93,7 +94,6 @@ IncludeCategories:
     CaseSensitive:   false
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
-IndentAccessModifiers: false 
 # Section 8.3a Switch Statements
 IndentCaseLabels: true
 # Section 8.3a Switch Statements
