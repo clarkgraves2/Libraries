@@ -148,8 +148,8 @@ ReflowComments:  true
 RemoveBracesLLVM: false
 # Section 3.3 Blank Lines
 SeparateDefinitionBlocks: Always
-
-SortIncludes: Never
+# Optional Rule to sort #include names
+SortIncludes: CaseSensitive
 # Section 1.6 Casts
 SpaceAfterCStyleCast: true
 # Section 3.1d Spaces
@@ -199,11 +199,5 @@ SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
 # Section 3.5a Tabs
 UseTab:          Never
-WhitespaceSensitiveMacros:
-  - STRINGIZE
-  - PP_STRINGIZE
-  - BOOST_PP_STRINGIZE
-  - NS_SWIFT_NAME
-  - CF_SWIFT_NAME
 ...
 
