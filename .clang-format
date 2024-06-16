@@ -77,12 +77,6 @@ BasedOnStyle:    ''
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 AllowAllConstructorInitializersOnNextLine: true
 FixNamespaceComments: true
-ForEachMacros:
-  - foreach
-  - Q_FOREACH
-  - BOOST_FOREACH
-IfMacros:
-  - KJ_IF_MAYBE
 IncludeBlocks:   Preserve
 IncludeCategories:
   - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
@@ -106,7 +100,8 @@ IndentGotoLabels: true
 IndentPPDirectives: None
 IndentExternBlock: AfterExternBlock
 IndentRequires:  false
-IndentWidth:     2
+# Section 3.4 Indentation
+IndentWidth:     4
 IndentWrappedFunctionNames: false
 InsertTrailingCommas: None
 JavaScriptQuotes: Leave
@@ -133,18 +128,23 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PenaltyIndentedWhitespace: 0
 PointerAlignment: Right
+
 PPIndentWidth:   -1
+# Section 3.1e Spaces
 ReferenceAlignment: Pointer
+# Section 1.2 Line Widths
 ReflowComments:  true
+# Section 1.3a Braces
 RemoveBracesLLVM: false
-SeparateDefinitionBlocks: Leave
-ShortNamespaceLines: 1
-SortIncludes:    CaseSensitive
-SortJavaStaticImport: Before
-SortUsingDeclarations: true
-SpaceAfterCStyleCast: false
+# Section 3.3 Blank Lines
+SeparateDefinitionBlocks: Always
+
+SortIncludes: Never
+# Section 1.6 Casts
+SpaceAfterCStyleCast: true
+# Section 3.1d Spaces
 SpaceAfterLogicalNot: false
-SpaceAfterTemplateKeyword: true
+# Section 3.1b Spaces
 SpaceBeforeAssignmentOperators: true
 # Section 3.1f Spaces
 SpaceBeforeCaseColon: false
