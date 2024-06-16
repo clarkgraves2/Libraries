@@ -56,12 +56,14 @@ BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
-BreakConstructorInitializers: BeforeColon
-BreakAfterJavaFieldAnnotations: false
-BreakStringLiterals: true
-ColumnLimit:     80
 
-CommentPragmas:  '^ IWYU pragma:'
+BreakConstructorInitializers: BeforeColon
+# Section 3.3a Blank Lines
+BreakAfterJavaFieldAnnotations: true
+# Section 1.2a Line Widths
+BreakStringLiterals: true
+# Section 1.2a Line Widths
+ColumnLimit:     80
 # Section 1.8b Keywords to Frequent
 QualifierAlignment: Left
 # Section 3.3a Blank Lines
