@@ -93,13 +93,13 @@ IncludeCategories:
     CaseSensitive:   false
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
-IndentAccessModifiers: false
-IndentCaseLabels: false
-IndentCaseBlocks: false
-IndentGotoLabels: true
+IndentAccessModifiers: false 
+# Section 8.3a Switch Statements
+IndentCaseLabels: true
+# Section 8.3a Switch Statements
+IndentCaseBlocks: true
+# Section 3.4a Indentation
 IndentPPDirectives: None
-IndentExternBlock: AfterExternBlock
-IndentRequires:  false
 # Section 3.4 Indentation
 IndentWidth:     4
 # Section 8.1 Variable Declarations
