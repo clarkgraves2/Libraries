@@ -23,10 +23,10 @@ AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
-AttributeMacros:
-  - __capability
-BinPackArguments: true
-BinPackParameters: true
+# Section 3.3a Blank Lines
+BinPackArguments: false
+# Section 3.3a Blank Lines
+BinPackParameters: false
 # Section 3.1f Spaces
 BitFieldColonSpacing: Both
 # Declares individual rules for BraceWrapping
