@@ -1,7 +1,6 @@
 ---
 Language:        Cpp
 # BasedOnStyle:  LLVM
-
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: None
 AlignConsecutiveMacros: None
@@ -30,30 +29,28 @@ BinPackArguments: true
 BinPackParameters: true
 # Section 3.1f Spaces
 BitFieldColonSpacing: Both
+# Declares individual rules for BraceWrapping
+BreakBeforeBraces: Custom
 # Section 1.3 a + b Braces
 BraceWrapping:
   AfterCaseLabel:  false
-  AfterClass:      false
-  AfterControlStatement: Never
+  AfterControlStatement: Always
   AfterEnum:       false
-  AfterFunction:   false
-  AfterNamespace:  false
+  AfterFunction:   true
+  AfterNamespace:  true
   AfterObjCDeclaration: false
-  AfterStruct:     false
-  AfterUnion:      false
-  AfterExternBlock: false
-  BeforeCatch:     false
-  BeforeElse:      false
-  BeforeLambdaBody: false
-  BeforeWhile:     false
+  AfterStruct:     true
+  AfterUnion:      true
+  AfterExternBlock: true
+  BeforeCatch:     true
+  BeforeElse:      true
+  BeforeWhile:     true
   IndentBraces:    false
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
 # 3.2c Alignment
 BreakBeforeBinaryOperators: All
-# Declares individual rules at BraceWrapping
-BreakBeforeBraces: Custom
 # Section 3.3a Blank Lines
 BreakAfterJavaFieldAnnotations: true
 # Section 1.2a Line Widths
