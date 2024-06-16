@@ -28,6 +28,8 @@ AttributeMacros:
   - __capability
 BinPackArguments: true
 BinPackParameters: true
+# Section 3.1f Spaces
+BitFieldColonSpacing: Both
 BraceWrapping:
   AfterCaseLabel:  false
   AfterClass:      false
@@ -157,30 +159,33 @@ SpaceBeforeParensOptions:
   AfterIfMacros:   true
   AfterOverloadedOperator: false
   BeforeNonEmptyParentheses: false
+# Section 3.1e Defaults to Pointer Allignement
 SpaceAroundPointerQualifiers: Default
-SpaceBeforeRangeBasedForLoopColon: true
+# Section 3.1i Spaces
 SpaceInEmptyBlock: false
+# Section 3.1i Spaces
 SpaceInEmptyParentheses: false
+# Section 3.1c Spaces
 SpacesBeforeTrailingComments: 1
+# Section 3.1c Spaces
 SpacesInAngles:  Never
+# Section 3.1i Spaces
 SpacesInConditionalStatement: false
+# Section 3.1i Spaces
 SpacesInContainerLiterals: true
+# Section 3.1i Spaces
 SpacesInCStyleCastParentheses: false
+# Section 3.1c Spaces
 SpacesInLineCommentPrefix:
   Minimum:         1
   Maximum:         -1
+# Section 3.1i Spaces
 SpacesInParentheses: false
+# Section 3.1i Spaces
 SpacesInSquareBrackets: false
+# Section 3.1h. Spaces
 SpaceBeforeSquareBrackets: false
-BitFieldColonSpacing: Both
-Standard:        Latest
-StatementAttributeLikeMacros:
-  - Q_EMIT
-StatementMacros:
-  - Q_UNUSED
-  - QT_REQUIRE_VERSION
-TabWidth:        8
-UseCRLF:         false
+# Section 3.5a Tabs
 UseTab:          Never
 WhitespaceSensitiveMacros:
   - STRINGIZE
