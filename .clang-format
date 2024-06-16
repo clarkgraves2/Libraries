@@ -146,18 +146,20 @@ SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
+# Section 3.1f Spaces
 SpaceBeforeCaseColon: false
-SpaceBeforeCpp11BracedList: false
-SpaceBeforeCtorInitializerColon: true
+# Section 3.1f Spaces
 SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: ControlStatements
+# Section 3.1 Spaces
+SpaceBeforeParens: Custom
 SpaceBeforeParensOptions:
+  # Section 3.1a Spaces
   AfterControlStatements: true
-  AfterForeachMacros: true
-  AfterFunctionDefinitionName: false
-  AfterFunctionDeclarationName: false
-  AfterIfMacros:   true
-  AfterOverloadedOperator: false
+  # Section 3.1a Spaces
+  AfterFunctionDefinitionName: true
+  # Section 3.1j Spaces
+  AfterFunctionDeclarationName: true 
+  # Section 3.1a Spaces
   BeforeNonEmptyParentheses: false
 # Section 3.1e Defaults to Pointer Allignement
 SpaceAroundPointerQualifiers: Default
