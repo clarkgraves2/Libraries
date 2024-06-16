@@ -1,23 +1,21 @@
 ---
 Language:        Cpp
 # BasedOnStyle:  LLVM
-
+# Section 3.2 Alignment
 AlignAfterOpenBracket: Align
-
-AlignArrayOfStructures: None
-
-AlignConsecutiveMacros: None
-
-AlignConsecutiveAssignments: None
-
-AlignConsecutiveBitFields: None
-
-AlignConsecutiveDeclarations: None
-
-AlignEscapedNewlines: Right
-
+# Section 3.2 Alignment
+AlignArrayOfStructures: Right
+# Section 3.2 Alignment
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+# Section 3.2 Alignment
+AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+# Section 3.2 Alignment
+AlignConsecutiveBitFields:  AcrossEmptyLinesAndComments
+# Section 3.2 Alignment
+AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+# Section 3.2 Alignment
 AlignOperands:   Align
-
+# Section 3.2 Alignment
 AlignTrailingComments: true
 # Section 1.2a Line Widths
 AllowAllArgumentsOnNextLine: true
