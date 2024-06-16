@@ -102,17 +102,15 @@ IndentExternBlock: AfterExternBlock
 IndentRequires:  false
 # Section 3.4 Indentation
 IndentWidth:     4
-IndentWrappedFunctionNames: false
-InsertTrailingCommas: None
-JavaScriptQuotes: Leave
+# Section 8.1 Variable Declarations
 JavaScriptWrapImports: true
+# Section 3.3 Blank Lines
 KeepEmptyLinesAtTheStartOfBlocks: true
-LambdaBodyIndentation: Signature
-MacroBlockBegin: ''
-MacroBlockEnd:   ''
+# Section 3.3 Blank Lines
 MaxEmptyLinesToKeep: 1
 # Section 3.4a Indentation
 NamespaceIndentation: All
+# Penalites that prioritized rules higher value higher priority.
 PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 300
