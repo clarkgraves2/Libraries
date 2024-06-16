@@ -60,11 +60,15 @@ BreakConstructorInitializers: BeforeColon
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
 ColumnLimit:     80
-CommentPragmas:  '^ IWYU pragma:'
-QualifierAlignment: Leave
-CompactNamespaces: false
-ConstructorInitializerIndentWidth: 4
 
+CommentPragmas:  '^ IWYU pragma:'
+# Section 1.8b Keywords to Frequent
+QualifierAlignment: Left
+# Section 3.3a Blank Lines
+CompactNamespaces: false
+# Section 3.4a Indentation
+ConstructorInitializerIndentWidth: 4
+# Section 3.4a Indentation
 ContinuationIndentWidth: 4
 # Analyze for the most used line endings. 
 DeriveLineEnding: true
