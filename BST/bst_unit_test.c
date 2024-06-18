@@ -43,7 +43,7 @@ END_TEST
 START_TEST (test_insert_node_recursive)
 {
     bst_t * tree_to_test = create_new_tree();
-    node_t * node_to_test = insert_node_recursive (tree_to_test, 7)
+    node_t * node_to_test = insert_node_recursive (tree_to_test, 7);
 
     // Check if node is not NULL (allocation success)
     //
