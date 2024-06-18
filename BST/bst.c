@@ -59,11 +59,56 @@ insert_node_recursive (node_t * root, int data)
 void
 insert_node (bst_t * bst, int data)
 {
-    if (bst == NULL)
+    if (NULL == bst)
     {
         return;
     }
     bst->root = insert_node_recursive (bst->root, data);
+}
+
+// Search for a node
+//
+node_t *
+search (node_t * root, int key)
+{
+    if (NULL == root || key == root->data)
+    {
+        return root;
+    }
+
+    if (key < root->data)
+    {
+        return search (root->left, key);
+    }
+    return search (root->right, key);
+}
+
+// Find the minimum value node
+//
+node_t *
+find_min (node_t * node)
+{
+    node_t * current = node;
+
+    while (current && current->left != NULL)
+    {
+        current = current->left;
+    }
+    return current;
+}
+
+// Find the maximum value node
+//
+node_t *
+find_max (node_t * node)
+{
+    node_t * current = node;
+
+    while (current && current->right != NULL)
+    {
+        current = current->right;
+    }
+    return current;
 }
 
 // Function to print the BST in order
