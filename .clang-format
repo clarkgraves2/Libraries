@@ -28,7 +28,7 @@ AllowShortBlocksOnASingleLine: Never
 # Section 3.3a Blank Lines
 AllowShortCaseLabelsOnASingleLine: false
 # Section 3.3a Blank Lines
-AllowShortFunctionsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
 # Section 3.3a Blank Lines
 AllowShortLambdasOnASingleLine: None
 # Section 3.3a Blank Lines
