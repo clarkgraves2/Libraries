@@ -28,7 +28,7 @@ AllowShortBlocksOnASingleLine: Never
 # Section 3.3a Blank Lines
 AllowShortCaseLabelsOnASingleLine: false
 # Section 3.3a Blank Lines
-AllowShortFunctionsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
 # Section 3.3a Blank Lines
 AllowShortLambdasOnASingleLine: None
 # Section 3.3a Blank Lines
@@ -170,7 +170,7 @@ SpaceBeforeParensOptions:
   # Section 3.1j Spaces
   AfterFunctionDeclarationName: true 
   # Section 3.1a Spaces
-  BeforeNonEmptyParentheses: false
+  BeforeNonEmptyParentheses: true
 # Section 3.1e Defaults to Pointer Allignement
 SpaceAroundPointerQualifiers: Default
 # Section 3.1i Spaces
