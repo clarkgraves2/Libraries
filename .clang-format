@@ -170,7 +170,7 @@ SpaceBeforeParensOptions:
   # Section 3.1j Spaces
   AfterFunctionDeclarationName: true 
   # Section 3.1a Spaces
-  BeforeNonEmptyParentheses: false
+  BeforeNonEmptyParentheses: true
 # Section 3.1e Defaults to Pointer Allignement
 SpaceAroundPointerQualifiers: Default
 # Section 3.1i Spaces
