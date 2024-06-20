@@ -26,6 +26,8 @@ node_t * find_min(node_t* node);
 
 node_t * find_max(node_t* node);
 
-void print_in_order(node_t *root); 
+node_t * delete_node (node_t * root, int data);
+
+void in_order_traversal(node_t* root);
 
 #endif

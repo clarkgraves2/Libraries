@@ -1,6 +1,6 @@
-# Define the compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -Wwrite-strings -Wvla -Winline -Wfloat-equal -Wstack-usage=1024 -std=c99
+VFLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 # Define the Check library flags
 CHECK_CFLAGS = $(shell pkg-config --cflags check)
@@ -29,5 +29,18 @@ $(TARGET): $(OBJ)
 clean:
 	rm -f $(OBJ) $(TARGET)
 
+.PHONY: valgrind
+valgrind: $(TARGET)
+	valgrind $(VFLAGS) ./$(TARGET)
+
+.PHONY: debug
+debug: $(TARGET)
+	gdb ./$(TARGET)
+
 format:
-	$(CLANG_FORMAT) $(CLANG_FORMAT_FLAGS) $(SRC) 
+	$(CLANG_FORMAT) $(CLANG_FORMAT_FLAGS) $(SRC)
+
+# Add debug flags and rebuild
+.PHONY: build-debug
+build-debug: CFLAGS += -g3
+build-debug: $(TARGET)

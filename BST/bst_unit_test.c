@@ -5,6 +5,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFFER_SIZE 1024
+char buffer[BUFFER_SIZE];
+
+// Helper function to insert nodes easily
+//
+void
+insert_nodes (bst_t * bst, int values[], int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        insert_node (bst, values[i]);
+    }
+}
+
+// Helper function to open stdout to a known state and redirect it to buffer
+//
+void
+setup_redirect_stdout ()
+{
+    freopen ("/dev/null", "a", stdout);
+    setvbuf (stdout, buffer, _IOFBF, BUFFER_SIZE);
+}
+
+// Helper function to flush the buffer and reset stdout to terminal
+//
+void
+teardown_redirect_stdout ()
+{
+    fflush (stdout);
+    freopen ("/dev/tty", "a", stdout);
+}
+
 START_TEST (test_create_new_tree)
 {
     bst_t * bst = create_new_tree();
@@ -18,7 +50,6 @@ START_TEST (test_create_new_tree)
     // Free the allocated memory
     free (bst);
 }
-
 END_TEST
 
 START_TEST (test_create_new_node)
@@ -39,7 +70,6 @@ START_TEST (test_create_new_node)
     //
     free (node);
 }
-
 END_TEST
 
 START_TEST (test_insert_node)
@@ -75,7 +105,6 @@ START_TEST (test_insert_node)
     free (bst->root);
     free (bst);
 }
-
 END_TEST
 
 START_TEST (test_insert_node_recursive)
@@ -123,7 +152,6 @@ START_TEST (test_insert_node_recursive)
     free (bst->root);
     free (bst);
 }
-
 END_TEST
 
 START_TEST (test_search)
@@ -172,7 +200,6 @@ START_TEST (test_search)
     ck_assert_ptr_ne (search_result, NULL);
     ck_assert_int_eq (search_result->data, 40);
 }
-
 END_TEST
 
 START_TEST (test_find_min)
@@ -205,7 +232,6 @@ START_TEST (test_find_min)
     ck_assert_ptr_ne (find_min_result, NULL);
     ck_assert_int_eq (find_min_result->data, 20);
 }
-
 END_TEST
 
 START_TEST (test_find_max)
@@ -238,9 +264,115 @@ START_TEST (test_find_max)
     ck_assert_ptr_ne (find_max_result, NULL);
     ck_assert_int_eq (find_max_result->data, 70);
 
-    printf("Max %d\n", find_max_result->data);
+    // printf ("Expected Output: 70\n");
+    // printf ("Max Result: %d\n", find_max_result->data);
 }
+END_TEST
 
+START_TEST (test_delete_node)
+{
+    bst_t * bst      = create_new_tree();
+    int     values[] = {50, 30, 70, 20, 40, 60, 80};
+    insert_nodes (bst, values, sizeof (values) / sizeof (values[0]));
+
+    /* Initial tree structure
+     *        50
+     *       /  \
+     *     30    70
+     *    /  \  /  \
+     *   20  40 60  80
+     */
+
+    // Delete a node with no children (leaf node)
+    //
+    bst->root = delete_node (bst->root, 20);
+
+    /* Expected tree structure
+     *        50
+     *       /  \
+     *     30    70
+     *      \   /  \
+     *      40 60  80
+     */
+
+    // Node 20 should be deleted
+    //
+    ck_assert_ptr_eq (search (bst->root, 20), NULL);
+
+    // Delete a node with one child
+    //
+    bst->root = delete_node (bst->root, 30);
+
+    /* Expected tree structure
+     *        50
+     *       /  \
+     *     40    70
+     *           /  \
+     *         60   80
+     */
+
+    // Node 30 should be deleted
+    //
+    ck_assert_ptr_eq (search (bst->root, 30), NULL);
+
+    // Delete a node with two children
+    //
+    bst->root = delete_node (bst->root, 50);
+
+    /* Expected tree structure
+     *         60
+     *       /  \
+     *     40    70
+     *             \
+     *              80
+     */
+
+    // Node 50 should be deleted
+    //
+    ck_assert_ptr_eq (search (bst->root, 50), NULL);
+
+    // Verify the new root is 60
+    //
+    ck_assert_ptr_ne (bst->root, NULL);
+    ck_assert_int_eq (bst->root->data, 60);
+
+    // Verify in-order traversal
+    //  
+    // printf ("In-order traversal after deletions: \n");
+    // printf("Expected output: 40 60 70 80\n");
+    // printf ("Output: ");
+    // in_order_traversal(bst->root);
+    // printf ("\n");
+}
+END_TEST
+
+START_TEST (test_in_order_traversal)
+{
+
+    bst_t * bst      = create_new_tree();
+    int     values[] = {50, 30, 70, 20, 40, 60, 80};
+    
+    insert_nodes (bst, values, sizeof (values) / sizeof (values[0]));
+
+    // Expected output
+    //
+    const char * expected_output = "20 30 40 50 60 70 80 ";
+
+    // Capture in-order traversal output
+    //
+    setup_redirect_stdout();
+    in_order_traversal (bst->root);
+    teardown_redirect_stdout();
+
+    // Check if the captured output matches the expected output
+    //
+    ck_assert_str_eq (buffer, expected_output);
+
+    // Clean up
+    //
+    free (bst->root);
+    free (bst);
+}
 END_TEST
 
 // Define test suite and add test cases
@@ -262,6 +394,8 @@ bst_suite (void)
     tcase_add_test (tc_core, test_search);
     tcase_add_test (tc_core, test_find_min);
     tcase_add_test (tc_core, test_find_max);
+    tcase_add_test (tc_core, test_delete_node);
+    tcase_add_test (tc_core, test_in_order_traversal);
 
     suite_add_tcase (s, tc_core);
 

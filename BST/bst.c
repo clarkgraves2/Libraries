@@ -1,4 +1,5 @@
 #include "bst.h"
+#include <check.h>
 #include <fnmatch.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -111,15 +112,108 @@ find_max (node_t * node)
     return current;
 }
 
-// Function to print the BST in order
+// Delete a Node from the Tree
+//
+node_t *
+delete_node (node_t * root, int data)
+{
+    if (NULL == root)
+    {
+        return root;
+    }
+    if (data < root->data)
+    {
+        root->left = delete_node (root->left, data);
+    }
+    else if (data > root->data)
+    {
+        root->right = delete_node (root->right, data);
+    }
+    else
+    {
+        if (root->left == NULL)
+        {
+            node_t * temp = root->right;
+            free (root);
+            return temp;
+        }
+        else if (root->right == NULL)
+        {
+            node_t * temp = root->left;
+            free (root);
+            return temp;
+        }
+
+        node_t * temp = find_min (root->right);
+        root->data    = temp->data;
+        root->right   = delete_node (root->right, temp->data);
+    }
+    return root;
+}
+
+// In Order Traversal of Tree with Print Function
 //
 void
-print_in_order (node_t * root)
+in_order_traversal (node_t * root)
 {
     if (root != NULL)
     {
-        print_in_order (root->left);
+        in_order_traversal (root->left);
         printf ("%d ", root->data);
-        print_in_order (root->right);
+        in_order_traversal (root->right);
+    }
+}
+
+// Calculates the height of the tree
+//
+int
+height (node_t * root)
+{
+    if (root == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        int left_height  = height (root->left);
+        int right_height = height (root->right);
+        if (left_height > right_height)
+        {
+            return left_height + 1;
+        }
+        else
+        {
+            return right_height + 1;
+        }
+    }
+}
+
+// Print nodes at the current level
+void
+printCurrentLevel (node_t * root, int level)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+    if (level == 1)
+    {
+        printf ("%d ", root->data);
+    }
+    else if (level > 1)
+    {
+        printCurrentLevel (root->left, level - 1);
+        printCurrentLevel (root->right, level - 1);
+    }
+}
+
+// Level-order traversal
+void
+levelOrderTraversal (node_t * root)
+{
+    int hgt = height (root);
+    for (int idx = 1; idx <= hgt; idx++)
+    {
+        printCurrentLevel (root, idx);
     }
 }
