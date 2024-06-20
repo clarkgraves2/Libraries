@@ -147,7 +147,7 @@ ReflowComments:  true
 # Section 1.3a Braces
 RemoveBracesLLVM: false
 # Section 3.3 Blank Lines
-SeparateDefinitionBlocks: Always
+SeparateDefinitionBlocks: Leave
 # Optional Rule to sort #include names
 SortIncludes: CaseSensitive
 # Section 1.6 Casts
@@ -173,8 +173,6 @@ SpaceBeforeParensOptions:
   BeforeNonEmptyParentheses: true
 # Section 3.1e Defaults to Pointer Allignement
 SpaceAroundPointerQualifiers: Default
-# Section 3.3 Blank Lines
-SeparateDefinitionBlocks: Leave
 # Section 3.1i Spaces
 SpaceInEmptyBlock: false
 # Section 3.1i Spaces
