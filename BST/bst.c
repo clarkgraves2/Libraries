@@ -1,9 +1,7 @@
-#include "bst.h"
-#include <check.h>
-#include <fnmatch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "bst.h"
 
 bst_t *
 create_new_tree (void)
@@ -36,7 +34,7 @@ create_new_node (int data)
 }
 
 // Insert a node into the BST recursively
-//
+// 
 node_t *
 insert_node_recursive (node_t * root, int data)
 {
@@ -68,7 +66,7 @@ insert_node (bst_t * bst, int data)
 }
 
 // Search for a node
-//
+// 
 node_t *
 search (node_t * root, int key)
 {
@@ -137,7 +135,8 @@ delete_node (node_t * root, int data)
             free (root);
             return temp;
         }
-        else if (root->right == NULL)
+       
+        if (root->right == NULL)
         {
             node_t * temp = root->left;
             free (root);
@@ -173,24 +172,21 @@ height (node_t * root)
     {
         return 0;
     }
-    else
+    
+    int left_height  = height (root->left);
+    int right_height = height (root->right);
+    
+    if (left_height > right_height)
     {
-        int left_height  = height (root->left);
-        int right_height = height (root->right);
-        if (left_height > right_height)
-        {
-            return left_height + 1;
-        }
-        else
-        {
-            return right_height + 1;
-        }
+        return left_height + 1;
     }
+        return right_height + 1;
 }
 
 // Print nodes at the current level
+// 
 void
-printCurrentLevel (node_t * root, int level)
+print_current_level (node_t * root, int level)
 {
     if (root == NULL)
     {
@@ -202,18 +198,19 @@ printCurrentLevel (node_t * root, int level)
     }
     else if (level > 1)
     {
-        printCurrentLevel (root->left, level - 1);
-        printCurrentLevel (root->right, level - 1);
+        print_current_level (root->left, level - 1);
+        print_current_level (root->right, level - 1);
     }
 }
 
 // Level-order traversal
+//
 void
-levelOrderTraversal (node_t * root)
+level_order_traversal (node_t * root)
 {
     int hgt = height (root);
     for (int idx = 1; idx <= hgt; idx++)
     {
-        printCurrentLevel (root, idx);
+        print_current_level (root, idx);
     }
 }

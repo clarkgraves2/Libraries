@@ -1,9 +1,9 @@
-#include "bst.h"
 #include <check.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "bst.h"
 
 #define BUFFER_SIZE 1024
 char buffer[BUFFER_SIZE];
@@ -17,24 +17,6 @@ insert_nodes (bst_t * bst, int values[], int size)
     {
         insert_node (bst, values[i]);
     }
-}
-
-// Helper function to open stdout to a known state and redirect it to buffer
-//
-void
-setup_redirect_stdout ()
-{
-    freopen ("/dev/null", "a", stdout);
-    setvbuf (stdout, buffer, _IOFBF, BUFFER_SIZE);
-}
-
-// Helper function to flush the buffer and reset stdout to terminal
-//
-void
-teardown_redirect_stdout ()
-{
-    fflush (stdout);
-    freopen ("/dev/tty", "a", stdout);
 }
 
 START_TEST (test_create_new_tree)
@@ -101,7 +83,9 @@ START_TEST (test_insert_node)
     free (bst->root->left->left);
     free (bst->root->left->right);
     free (bst->root->left);
-    free (bst->root->right);
+    free (bst->root->right);void setup_redirect_stdout(void);
+
+void teardown_redirect_stdout (void);
     free (bst->root);
     free (bst);
 }
@@ -335,41 +319,147 @@ START_TEST (test_delete_node)
     //
     ck_assert_ptr_ne (bst->root, NULL);
     ck_assert_int_eq (bst->root->data, 60);
-
-    // Verify in-order traversal
-    //  
-    // printf ("In-order traversal after deletions: \n");
-    // printf("Expected output: 40 60 70 80\n");
-    // printf ("Output: ");
-    // in_order_traversal(bst->root);
-    // printf ("\n");
 }
 END_TEST
 
 START_TEST (test_in_order_traversal)
 {
+    bst_t * bst = create_new_tree();
+    insert_node (bst, 50);
+    insert_node (bst, 30);
+    insert_node (bst, 70);
+    insert_node (bst, 20);
+    insert_node (bst, 40);
+    insert_node (bst, 60);
+    insert_node (bst, 80);
+// Redirect stdout to capture printf output
+    char buffer[526];
+    memset(buffer, 0, sizeof(buffer));
+    freopen("/dev/null", "a", stdout); // Redirect stdout to /dev/null
+    setbuf(stdout, buffer); // Redirect printf to buffer
 
-    bst_t * bst      = create_new_tree();
-    int     values[] = {50, 30, 70, 20, 40, 60, 80};
-    
-    insert_nodes (bst, values, sizeof (values) / sizeof (values[0]));
+    // Perform in-order traversal
+    in_order_traversal(bst->root);
+    fflush(stdout); // Flush stdout buffer
 
-    // Expected output
-    //
-    const char * expected_output = "20 30 40 50 60 70 80 ";
+    // Check the output against the expected result
+    char expected_output[] = "20 30 40 50 60 70 80 ";
+    ck_assert_str_eq(buffer, expected_output);
 
-    // Capture in-order traversal output
-    //
-    setup_redirect_stdout();
-    in_order_traversal (bst->root);
-    teardown_redirect_stdout();
+    // Clean up allocated memory
+    free(bst->root->left->left);
+    free(bst->root->left->right);
+    free(bst->root->right->left);
+    free(bst->root->right->right);
+    free(bst->root->left);
+    free(bst->root->right);
+    free(bst->root);
+    free(bst);
+}
+END_TEST
 
-    // Check if the captured output matches the expected output
-    //
-    ck_assert_str_eq (buffer, expected_output);
+START_TEST (test_height)
+{
+    bst_t * bst2 = create_new_tree();
 
-    // Clean up
-    //
+    insert_node (bst2, 50);
+
+    ck_assert_int_eq (height (bst2->root), 1);
+
+    insert_node (bst2, 30);
+    insert_node (bst2, 70);
+
+    ck_assert_int_eq (height (bst2->root), 2);
+
+    insert_node (bst2, 20);
+    insert_node (bst2, 40);
+    insert_node (bst2, 60);
+    insert_node (bst2, 80);
+
+    ck_assert_int_eq (height (bst2->root), 3);
+
+    insert_node (bst2, 10);
+
+    ck_assert_int_eq (height (bst2->root), 4);
+}
+END_TEST
+
+START_TEST (test_print_current_level)
+{
+    bst_t * bst = create_new_tree();
+    insert_node (bst, 50);
+    insert_node (bst, 30);
+    insert_node (bst, 70);
+    insert_node (bst, 20);
+    insert_node (bst, 40);
+
+    char buffer[256];
+    freopen ("/dev/null", "a", stdout);
+    setbuf (stdout, buffer);
+
+    // Print level 1 (root level)
+    print_current_level (bst->root, 1);
+    fflush (stdout);
+    ck_assert_str_eq (buffer, "50 ");
+
+    // Clear buffer
+    memset (buffer, 0, sizeof (buffer));
+    freopen ("/dev/null", "a", stdout);
+    setbuf (stdout, buffer);
+
+    // Print level 2
+    print_current_level (bst->root, 2);
+    fflush (stdout);
+    ck_assert_str_eq (buffer, "30 70 ");
+
+    // Clear buffer
+    memset (buffer, 0, sizeof (buffer));
+    freopen ("/dev/null", "a", stdout);
+    setbuf (stdout, buffer);
+
+    // Print level 3
+    print_current_level (bst->root, 3);
+    fflush (stdout);
+    ck_assert_str_eq (buffer, "20 40 ");
+
+    // Free the allocated memory
+    free (bst->root->left->left);
+    free (bst->root->left->right);
+    free (bst->root->left);
+    free (bst->root->right);
+    free (bst->root);
+    free (bst);
+}
+END_TEST
+
+// Test case for levelOrderTraversal function
+START_TEST (test_level_order_traversal)
+{
+    bst_t * bst = create_new_tree();
+    insert_node (bst, 50);
+    insert_node (bst, 30);
+    insert_node (bst, 70);
+    insert_node (bst, 20);
+    insert_node (bst, 40);
+    insert_node (bst, 60);
+    insert_node (bst, 80);
+
+    char buffer[256];
+    freopen ("/dev/null", "a", stdout);
+    setbuf (stdout, buffer);
+
+    // Perform level-order traversal
+    level_order_traversal (bst->root);
+    fflush (stdout);
+    ck_assert_str_eq (buffer, "50 30 70 20 40 60 80 ");
+
+    // Free the allocated memory
+    free (bst->root->left->left);
+    free (bst->root->left->right);
+    free (bst->root->right->left);
+    free (bst->root->right->right);
+    free (bst->root->left);
+    free (bst->root->right);
     free (bst->root);
     free (bst);
 }
@@ -396,6 +486,9 @@ bst_suite (void)
     tcase_add_test (tc_core, test_find_max);
     tcase_add_test (tc_core, test_delete_node);
     tcase_add_test (tc_core, test_in_order_traversal);
+    tcase_add_test (tc_core, test_height);
+    tcase_add_test (tc_core, test_print_current_level);
+    tcase_add_test (tc_core, test_level_order_traversal);
 
     suite_add_tcase (s, tc_core);
 
