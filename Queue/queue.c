@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <fnmatch.h>
-#include "Queue.h"
+#include "queue.h"
 
 struct node
 {
@@ -18,9 +19,34 @@ struct queue
 };
 
 queue_t *
-queue_create (void)
+create_queue (void)
 {
     return calloc(1, sizeof(queue_t));
+}
+
+void destroy_queue(queue_t **queue) {
+    if (queue == NULL || *queue == NULL) {
+        return;
+    }
+
+    // Free all nodes in the queue
+    struct node* current = (*queue)->front;
+    while (current != NULL) {
+        struct node* temp = current;
+        current = current->next;
+        
+        // Free the value if it's not NULL
+        if (temp->value != NULL) {
+            free(temp->value);
+        }
+        
+        // Free the node
+        free(temp);
+    }
+
+    // Free the queue structure itself
+    free(*queue);
+    *queue = NULL;  // Set the original pointer to NULL
 }
 
 int queue_enqueue(queue_t * queue, void * item)
@@ -88,4 +114,8 @@ int queue_size(queue_t * queue)
     return queue->size;
 }
 
+bool queue_is_empty(queue_t * queue) 
+{
+    return (queue == NULL || queue->size == 0);
+}
 
