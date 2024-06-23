@@ -7,6 +7,7 @@
 #define QUEUE_H
 
 #include <sys/types.h>
+#include <stdbool.h>
 
 /**
  * @brief Opaque linked-list type.
@@ -31,7 +32,7 @@ void destroy_queue (queue_t **queue);
 
 int queue_enqueue (queue_t * queue, void * item);
 
-void * queue_dequeue (queue_t * queue);
+int queue_dequeue(queue_t *queue, void **item);
 
 int queue_size (queue_t * queue);
 
