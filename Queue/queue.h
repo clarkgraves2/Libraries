@@ -38,4 +38,14 @@ int queue_size (queue_t * queue);
 
 bool queue_is_empty(queue_t * queue); 
 
+int queue_peek (queue_t * queue, void ** item);
+
+void queue_clear (queue_t * queue);
+
+queue_t * queue_copy (queue_t * queue);
+
+void queue_for_each (queue_t * queue, void (*func) (void *));
+
+bool queue_is_full (queue_t * queue);
+
 #endif /* QUEUE_H */

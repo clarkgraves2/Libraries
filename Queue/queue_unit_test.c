@@ -229,10 +229,128 @@ START_TEST (test_queue_is_empty)
 }
 END_TEST
 
+// Helper function for queue_foreach test
+static void
+increment_int (void * item)
+{
+    (*(int *) item)++;
+}
+
+START_TEST (test_queue_peek)
+{
+
+    queue_t * queue  = create_queue();
+    int       value1 = 10, value2 = 20;
+    void *    peeked_item;
+
+    // Test peek on empty queue
+    ck_assert_int_eq (queue_peek (queue, &peeked_item), -1);
+
+    queue_enqueue (queue, &value1);
+    queue_enqueue (queue, &value2);
+
+    // Test peek on non-empty queue
+    ck_assert_int_eq (queue_peek (queue, &peeked_item), 0);
+    ck_assert_int_eq (*(int *) peeked_item, 10);
+
+    // Ensure peek doesn't remove the item
+    ck_assert_int_eq (queue_size (queue), 2);
+
+    destroy_queue (&queue);
+}
+END_TEST
+
+START_TEST (test_queue_clear)
+{
+    queue_t * queue  = create_queue();
+    int       value1 = 10, value2 = 20;
+
+    queue_enqueue (queue, &value1);
+    queue_enqueue (queue, &value2);
+
+    queue_clear (queue);
+
+    ck_assert_int_eq (queue_size (queue), 0);
+    ck_assert (queue_is_empty (queue));
+
+    destroy_queue (&queue);
+}
+END_TEST
+
+START_TEST (test_queue_copy)
+{
+    queue_t * queue  = create_queue();
+    int       value1 = 10, value2 = 20;
+    queue_enqueue (queue, &value1);
+    queue_enqueue (queue, &value2);
+
+    queue_t * copied_queue = queue_copy (queue);
+
+    ck_assert_int_eq (queue_size (queue), queue_size (copied_queue));
+
+    void *item1, *item2;
+    queue_dequeue (queue, &item1);
+    queue_dequeue (copied_queue, &item2);
+    ck_assert_int_eq (*(int *) item1, *(int *) item2);
+
+    queue_dequeue (queue, &item1);
+    queue_dequeue (copied_queue, &item2);
+    ck_assert_int_eq (*(int *) item1, *(int *) item2);
+
+    destroy_queue (&queue);
+    destroy_queue (&copied_queue);
+}
+END_TEST
+
+START_TEST (test_queue_for_each)
+{
+    queue_t * queue  = create_queue();
+    int       value1 = 10, value2 = 20, value3 = 30;
+    queue_enqueue (queue, &value1);
+    queue_enqueue (queue, &value2);
+    queue_enqueue (queue, &value3);
+
+    queue_for_each (queue, increment_int);
+
+    void * item;
+    queue_dequeue (queue, &item);
+    ck_assert_int_eq (*(int *) item, 11);
+    queue_dequeue (queue, &item);
+    ck_assert_int_eq (*(int *) item, 21);
+    queue_dequeue (queue, &item);
+    ck_assert_int_eq (*(int *) item, 31);
+
+    destroy_queue (&queue);
+}
+END_TEST
+
+START_TEST (test_queue_is_full)
+{
+    queue_t * queue = create_queue();
+    int       value = 10;
+
+    // Assuming MAX_QUEUE_SIZE is 100
+    for (int i = 0; i < 99; i++)
+    {
+        queue_enqueue (queue, &value);
+        ck_assert (!queue_is_full (queue));
+    }
+
+    queue_enqueue (queue, &value);
+    ck_assert (queue_is_full (queue));
+
+    void * item;
+    queue_dequeue (queue, &item);
+    ck_assert (!queue_is_full (queue));
+
+    destroy_queue (&queue);
+}
+END_TEST
+
 // Define test suite and add test cases
 //
 Suite *
-bst_suite (void)
+queue_suite (void)
 {
     Suite * s;
     TCase * tc_core;
@@ -247,6 +365,11 @@ bst_suite (void)
     tcase_add_test (tc_core, test_queue_dequeue);
     tcase_add_test (tc_core, test_queue_size);
     tcase_add_test (tc_core, test_queue_is_empty);
+    tcase_add_test (tc_core, test_queue_peek);
+    tcase_add_test (tc_core, test_queue_clear);
+    tcase_add_test (tc_core, test_queue_copy);
+    tcase_add_test (tc_core, test_queue_for_each);
+    tcase_add_test (tc_core, test_queue_is_full);
 
     suite_add_tcase (s, tc_core);
 
@@ -260,7 +383,7 @@ main (void)
     Suite *   s;
     SRunner * sr;
 
-    s  = bst_suite();
+    s  = queue_suite();
     sr = srunner_create (s);
 
     srunner_run_all (sr, CK_NORMAL);
