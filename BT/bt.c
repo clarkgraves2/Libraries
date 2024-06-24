@@ -17,3 +17,59 @@ create_new_tree (void)
     return new_bt;
 }
 
+void traverse_pre_order(bt_t * binary_tree)
+{
+    if (NULL == binary_tree || NULL == binary_tree->root)
+    {
+        return;
+    }
+
+    node_t * node_pointer = binary_tree->root;
+
+    while(node_pointer)
+    {
+        printf("%d ", *(int *)(node_pointer->value));
+        
+        traverse_pre_order(node_pointer->left);
+
+        traverse_pre_order(node_pointer->right);
+    }
+}
+
+void traverse_in_order(bt_t * binary_tree)
+{
+    if (NULL == binary_tree || NULL == binary_tree->root)
+    {
+        return;
+    }
+
+    node_t * node_pointer = binary_tree->root;
+
+    while (node_pointer)
+    {
+        traverse_in_order(node_pointer->left);
+
+        printf("%d ", *(int *)(node_pointer->value));
+        
+        traverse_in_order(node_pointer->right);
+    }
+}
+
+void traverse_post_order(bt_t * binary_tree)
+{
+    if (NULL == binary_tree || NULL == binary_tree->root)
+    {
+        return;
+    }
+
+    node_t * node_pointer = binary_tree->root;
+
+    while (node_pointer)
+    {
+        traverse_in_order(node_pointer->left);
+        
+        traverse_in_order(node_pointer->right);
+
+        printf("%d ", *(int *)(node_pointer->value));
+    }
+}

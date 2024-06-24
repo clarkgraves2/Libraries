@@ -12,25 +12,45 @@ typedef struct bt {
 } bt_t;
 
 bt_t * create_new_tree(void);
-destroy_tree();
+
+destroy_tree(bt_t * );
+
 insert_left();
+
 insert_right();
+
 get_root();
+
 get_left_child();
+
 get_right_child();
+
 get_data();
+
 set_data();
+
 is_empty();
+
 size();
+
 height();
-traverse_preorder();
-traverse_inorder();
+
+void traverse_pre_order(bt_t * binary_tree);
+
+void traverse_in_order(bt_t * binary_tree);
+
 traverse_postorder();
+
 traverse_levelorder();
+
 find_node();
+
 delete_node();
+
 copy_tree();
+
 is_balanced();
+
 lowest_common_ancestor();
 
 
