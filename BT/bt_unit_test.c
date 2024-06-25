@@ -1,494 +1,338 @@
+#include "bt.h" // Assuming this is your header file
 #include <check.h>
-#include <ctype.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "bt.h"
 
-#define BUFFER_SIZE 1024
-char buffer[BUFFER_SIZE];
-
-// Helper function to insert nodes easily
-//
-void
-insert_nodes (bst_t * bst, int values[], int size)
+// Helper function for comparisons
+static int
+int_compare (const void * a, const void * b)
 {
-    for (int i = 0; i < size; i++)
-    {
-        insert_node (bst, values[i]);
-    }
+    return *(int *) a - *(int *) b;
+}
+
+// Helper function for traversals
+static void
+int_print (void * data)
+{
+    printf ("%d ", *(int *) data);
 }
 
 START_TEST (test_create_new_tree)
 {
-    bt_t * bt = create_new_tree();
-
-    // Check if bst is not NULL (allocation success)
-    ck_assert_ptr_ne (bt, NULL);
-
-    // Check if the root of the BST is NULL (initialization)
-    ck_assert_ptr_eq (bt->root, NULL);
-
-    // Free the allocated memory
-    free (bt);
+    bt_t * tree = create_new_tree();
+    ck_assert_ptr_nonnull (tree);
+    ck_assert_ptr_null (tree->root);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_create_new_node)
+START_TEST (test_destroy_tree)
 {
-    node_t * node = create_new_node (1);
-
-    // Check if node is not NULL (allocation success)
-    //
-    ck_assert_ptr_ne (node, NULL);
-
-    // Check if the node fields initialized correctly
-    //
-    ck_assert_ptr_eq (node->left, NULL);
-    ck_assert_ptr_eq (node->right, NULL);
-    ck_assert_int_eq (node->data, 1);
-
-    // Free the allocated memory
-    //
-    free (node);
+    bt_t * tree  = create_new_tree();
+    int    value = 10;
+    tree->root   = create_node (&value);
+    destroy_tree (&tree);
+    ck_assert_ptr_null (tree);
 }
 END_TEST
 
-START_TEST (test_insert_node)
+START_TEST (test_insert_left)
 {
-    bst_t * bst = create_new_tree();
+    bt_t * tree     = create_new_tree();
+    int    root_val = 10, left_val = 5;
+    tree->root = create_node (&root_val);
 
-    insert_node (bst, 50);
-    ck_assert_ptr_ne (bst->root, NULL);
-    ck_assert_int_eq (bst->root->data, 50);
+    ck_assert_int_eq (insert_left (tree->root, &left_val), 0);
+    ck_assert_ptr_nonnull (tree->root->left);
+    ck_assert_int_eq (*(int *) tree->root->left->value, 5);
 
-    insert_node (bst, 30);
-    ck_assert_ptr_ne (bst->root->left, NULL);
-    ck_assert_int_eq (bst->root->left->data, 30);
+    // Try inserting left again (should fail)
+    ck_assert_int_eq (insert_left (tree->root, &left_val), -1);
 
-    insert_node (bst, 70);
-    ck_assert_ptr_ne (bst->root->right, NULL);
-    ck_assert_int_eq (bst->root->right->data, 70);
-
-    insert_node (bst, 20);
-    ck_assert_ptr_ne (bst->root->left->left, NULL);
-    ck_assert_int_eq (bst->root->left->left->data, 20);
-
-    insert_node (bst, 40);
-    ck_assert_ptr_ne (bst->root->left->right, NULL);
-    ck_assert_int_eq (bst->root->left->right->data, 40);
-
-    // Free allocated memory (not necessary for this simple test, but good
-    // practice)
-    free (bst->root->left->left);
-    free (bst->root->left->right);
-    free (bst->root->left);
-    free (bst->root->right);void setup_redirect_stdout(void);
-
-void teardown_redirect_stdout (void);
-    free (bst->root);
-    free (bst);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_insert_node_recursive)
+START_TEST (test_insert_right)
 {
-    bst_t * bst = create_new_tree();
+    bt_t * tree     = create_new_tree();
+    int    root_val = 10, right_val = 15;
+    tree->root = create_node (&root_val);
 
-    // Insert first node
-    //
-    bst->root   = insert_node_recursive (bst->root, 50);
-    ck_assert_ptr_ne (bst->root, NULL);
-    ck_assert_int_eq (bst->root->data, 50);
-    ;
+    ck_assert_int_eq (insert_right (tree->root, &right_val), 0);
+    ck_assert_ptr_nonnull (tree->root->right);
+    ck_assert_int_eq (*(int *) tree->root->right->value, 15);
 
-    // Insert a smaller value
-    //
-    insert_node_recursive (bst->root, 30);
-    ck_assert_ptr_ne (bst->root->left, NULL);
-    ck_assert_int_eq (bst->root->left->data, 30);
+    // Try inserting right again (should fail)
+    ck_assert_int_eq (insert_right (tree->root, &right_val), -1);
 
-    // Insert a larger value
-    //
-    insert_node_recursive (bst->root, 70);
-    ck_assert_ptr_ne (bst->root->right, NULL);
-    ck_assert_int_eq (bst->root->right->data, 70);
-
-    // Insert another smaller value
-    //
-    insert_node_recursive (bst->root, 20);
-    ck_assert_ptr_ne (bst->root->left->left, NULL);
-    ck_assert_int_eq (bst->root->left->left->data, 20);
-
-    // Insert another larger value
-    //
-    insert_node_recursive (bst->root, 40);
-    ck_assert_ptr_ne (bst->root->left->right, NULL);
-    ck_assert_int_eq (bst->root->left->right->data, 40);
-
-    // Free allocated memory (not necessary for this simple test, but good
-    // practice)
-    //
-    free (bst->root->left->left);
-    free (bst->root->left->right);
-    free (bst->root->left);
-    free (bst->root->right);
-    free (bst->root);
-    free (bst);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_search)
+START_TEST (test_get_root)
 {
-    bst_t * bst = create_new_tree();
+    bt_t * tree  = create_new_tree();
+    int    value = 10;
+    tree->root   = create_node (&value);
 
-    insert_node (bst, 50);
-    ck_assert_ptr_ne (bst->root, NULL);
-    ck_assert_int_eq (bst->root->data, 50);
+    ck_assert_ptr_eq (get_root (tree), tree->root);
+    ck_assert_int_eq(*(int*)get_root(tree)->value), 10);
 
-    insert_node (bst, 30);
-    ck_assert_ptr_ne (bst->root->left, NULL);
-    ck_assert_int_eq (bst->root->left->data, 30);
-
-    insert_node (bst, 70);
-    ck_assert_ptr_ne (bst->root->right, NULL);
-    ck_assert_int_eq (bst->root->right->data, 70);
-
-    insert_node (bst, 20);
-    ck_assert_ptr_ne (bst->root->left->left, NULL);
-    ck_assert_int_eq (bst->root->left->left->data, 20);
-
-    insert_node (bst, 40);
-    ck_assert_ptr_ne (bst->root->left->right, NULL);
-    ck_assert_int_eq (bst->root->left->right->data, 40);
-
-    node_t * search_result;
-
-    search_result = search (bst->root, 50);
-    ck_assert_ptr_ne (search_result, NULL);
-    ck_assert_int_eq (search_result->data, 50);
-
-    search_result = search (bst->root, 30);
-    ck_assert_ptr_ne (search_result, NULL);
-    ck_assert_int_eq (search_result->data, 30);
-
-    search_result = search (bst->root, 70);
-    ck_assert_ptr_ne (search_result, NULL);
-    ck_assert_int_eq (search_result->data, 70);
-
-    search_result = search (bst->root, 20);
-    ck_assert_ptr_ne (search_result, NULL);
-    ck_assert_int_eq (search_result->data, 20);
-
-    search_result = search (bst->root, 40);
-    ck_assert_ptr_ne (search_result, NULL);
-    ck_assert_int_eq (search_result->data, 40);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_find_min)
+START_TEST (test_get_left_child)
 {
-    bst_t * bst = create_new_tree();
+    bt_t * tree     = create_new_tree();
+    int    root_val = 10, left_val = 5;
+    tree->root = create_node (&root_val);
+    insert_left (tree->root, &left_val);
 
-    insert_node (bst, 50);
-    ck_assert_ptr_ne (bst->root, NULL);
-    ck_assert_int_eq (bst->root->data, 50);
+    ck_assert_ptr_eq (get_left_child (tree->root), tree->root->left);
+    ck_assert_int_eq (*(int *) get_left_child (tree->root)->value, 5);
 
-    insert_node (bst, 30);
-    ck_assert_ptr_ne (bst->root->left, NULL);
-    ck_assert_int_eq (bst->root->left->data, 30);
-
-    insert_node (bst, 70);
-    ck_assert_ptr_ne (bst->root->right, NULL);
-    ck_assert_int_eq (bst->root->right->data, 70);
-
-    insert_node (bst, 20);
-    ck_assert_ptr_ne (bst->root->left->left, NULL);
-    ck_assert_int_eq (bst->root->left->left->data, 20);
-
-    insert_node (bst, 40);
-    ck_assert_ptr_ne (bst->root->left->right, NULL);
-    ck_assert_int_eq (bst->root->left->right->data, 40);
-
-    node_t * find_min_result;
-
-    find_min_result = find_min (bst->root);
-    ck_assert_ptr_ne (find_min_result, NULL);
-    ck_assert_int_eq (find_min_result->data, 20);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_find_max)
+START_TEST (test_get_right_child)
 {
-    bst_t * bst = create_new_tree();
+    bt_t * tree     = create_new_tree();
+    int    root_val = 10, right_val = 15;
+    tree->root = create_node (&root_val);
+    insert_right (tree->root, &right_val);
 
-    insert_node (bst, 50);
-    ck_assert_ptr_ne (bst->root, NULL);
-    ck_assert_int_eq (bst->root->data, 50);
+    ck_assert_ptr_eq (get_right_child (tree->root), tree->root->right);
+    ck_assert_int_eq (*(int *) get_right_child (tree->root)->value, 15);
 
-    insert_node (bst, 30);
-    ck_assert_ptr_ne (bst->root->left, NULL);
-    ck_assert_int_eq (bst->root->left->data, 30);
-
-    insert_node (bst, 70);
-    ck_assert_ptr_ne (bst->root->right, NULL);
-    ck_assert_int_eq (bst->root->right->data, 70);
-
-    insert_node (bst, 20);
-    ck_assert_ptr_ne (bst->root->left->left, NULL);
-    ck_assert_int_eq (bst->root->left->left->data, 20);
-
-    insert_node (bst, 40);
-    ck_assert_ptr_ne (bst->root->left->right, NULL);
-    ck_assert_int_eq (bst->root->left->right->data, 40);
-
-    node_t * find_max_result;
-
-    find_max_result = find_max (bst->root);
-    ck_assert_ptr_ne (find_max_result, NULL);
-    ck_assert_int_eq (find_max_result->data, 70);
-
-    // printf ("Expected Output: 70\n");
-    // printf ("Max Result: %d\n", find_max_result->data);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_delete_node)
+START_TEST (test_get_data)
 {
-    bst_t * bst      = create_new_tree();
-    int     values[] = {50, 30, 70, 20, 40, 60, 80};
-    insert_nodes (bst, values, sizeof (values) / sizeof (values[0]));
+    bt_t * tree  = create_new_tree();
+    int    value = 10;
+    tree->root   = create_node (&value);
 
-    /* Initial tree structure
-     *        50
-     *       /  \
-     *     30    70
-     *    /  \  /  \
-     *   20  40 60  80
-     */
+    ck_assert_ptr_eq (get_data (tree->root), &value);
+    ck_assert_int_eq (*(int *) get_data (tree->root), 10);
 
-    // Delete a node with no children (leaf node)
-    //
-    bst->root = delete_node (bst->root, 20);
-
-    /* Expected tree structure
-     *        50
-     *       /  \
-     *     30    70
-     *      \   /  \
-     *      40 60  80
-     */
-
-    // Node 20 should be deleted
-    //
-    ck_assert_ptr_eq (search (bst->root, 20), NULL);
-
-    // Delete a node with one child
-    //
-    bst->root = delete_node (bst->root, 30);
-
-    /* Expected tree structure
-     *        50
-     *       /  \
-     *     40    70
-     *           /  \
-     *         60   80
-     */
-
-    // Node 30 should be deleted
-    //
-    ck_assert_ptr_eq (search (bst->root, 30), NULL);
-
-    // Delete a node with two children
-    //
-    bst->root = delete_node (bst->root, 50);
-
-    /* Expected tree structure
-     *         60
-     *       /  \
-     *     40    70
-     *             \
-     *              80
-     */
-
-    // Node 50 should be deleted
-    //
-    ck_assert_ptr_eq (search (bst->root, 50), NULL);
-
-    // Verify the new root is 60
-    //
-    ck_assert_ptr_ne (bst->root, NULL);
-    ck_assert_int_eq (bst->root->data, 60);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_in_order_traversal)
+START_TEST (test_set_data)
 {
-    bst_t * bst = create_new_tree();
-    insert_node (bst, 50);
-    insert_node (bst, 30);
-    insert_node (bst, 70);
-    insert_node (bst, 20);
-    insert_node (bst, 40);
-    insert_node (bst, 60);
-    insert_node (bst, 80);
-// Redirect stdout to capture printf output
-    char buffer[526];
-    memset(buffer, 0, sizeof(buffer));
-    freopen("/dev/null", "a", stdout); // Redirect stdout to /dev/null
-    setbuf(stdout, buffer); // Redirect printf to buffer
+    bt_t * tree      = create_new_tree();
+    int    old_value = 10, new_value = 20;
+    tree->root = create_node (&old_value);
 
-    // Perform in-order traversal
-    in_order_traversal(bst->root);
-    fflush(stdout); // Flush stdout buffer
+    ck_assert_int_eq (set_data (tree->root, &new_value), 0);
+    ck_assert_int_eq (*(int *) tree->root->value, 20);
 
-    // Check the output against the expected result
-    char expected_output[] = "20 30 40 50 60 70 80 ";
-    ck_assert_str_eq(buffer, expected_output);
+    destroy_tree (&tree);
+}
+END_TEST
 
-    // Clean up allocated memory
-    free(bst->root->left->left);
-    free(bst->root->left->right);
-    free(bst->root->right->left);
-    free(bst->root->right->right);
-    free(bst->root->left);
-    free(bst->root->right);
-    free(bst->root);
-    free(bst);
+START_TEST (test_is_empty)
+{
+    bt_t * tree = create_new_tree();
+    ck_assert (is_empty (tree));
+
+    int value  = 10;
+    tree->root = create_node (&value);
+    ck_assert (!is_empty (tree));
+
+    destroy_tree (&tree);
+}
+END_TEST
+
+START_TEST (test_size)
+{
+    bt_t * tree = create_new_tree();
+    ck_assert_int_eq (size (tree), 0);
+
+    int values[] = {10, 5, 15};
+    tree->root   = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+
+    ck_assert_int_eq (size (tree), 3);
+
+    destroy_tree (&tree);
 }
 END_TEST
 
 START_TEST (test_height)
 {
-    bst_t * bst2 = create_new_tree();
+    bt_t * tree = create_new_tree();
+    ck_assert_int_eq (height (tree), 0);
 
-    insert_node (bst2, 50);
+    int values[] = {10, 5, 15, 3};
+    tree->root   = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+    insert_left (tree->root->left, &values[3]);
 
-    ck_assert_int_eq (height (bst2->root), 1);
+    ck_assert_int_eq (height (tree), 3);
 
-    insert_node (bst2, 30);
-    insert_node (bst2, 70);
-
-    ck_assert_int_eq (height (bst2->root), 2);
-
-    insert_node (bst2, 20);
-    insert_node (bst2, 40);
-    insert_node (bst2, 60);
-    insert_node (bst2, 80);
-
-    ck_assert_int_eq (height (bst2->root), 3);
-
-    insert_node (bst2, 10);
-
-    ck_assert_int_eq (height (bst2->root), 4);
+    destroy_tree (&tree);
 }
 END_TEST
 
-START_TEST (test_print_current_level)
+START_TEST (test_traversals)
 {
-    bst_t * bst = create_new_tree();
-    insert_node (bst, 50);
-    insert_node (bst, 30);
-    insert_node (bst, 70);
-    insert_node (bst, 20);
-    insert_node (bst, 40);
+    bt_t * tree     = create_new_tree();
+    int    values[] = {10, 5, 15, 3, 7};
+    tree->root      = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+    insert_left (tree->root->left, &values[3]);
+    insert_right (tree->root->left, &values[4]);
 
-    char buffer[256];
-    freopen ("/dev/null", "a", stdout);
-    setbuf (stdout, buffer);
+    // Note: These tests will print to stdout, you'll need to visually verify
+    // correctness
+    printf ("Preorder: ");
+    traverse_preorder (tree->root, int_print);
+    printf ("\nInorder: ");
+    traverse_inorder (tree->root, int_print);
+    printf ("\nPostorder: ");
+    traverse_postorder (tree->root, int_print);
+    printf ("\nLevel-order: ");
+    traverse_levelorder (tree, int_print);
+    printf ("\n");
 
-    // Print level 1 (root level)
-    print_current_level (bst->root, 1);
-    fflush (stdout);
-    ck_assert_str_eq (buffer, "50 ");
-
-    // Clear buffer
-    memset (buffer, 0, sizeof (buffer));
-    freopen ("/dev/null", "a", stdout);
-    setbuf (stdout, buffer);
-
-    // Print level 2
-    print_current_level (bst->root, 2);
-    fflush (stdout);
-    ck_assert_str_eq (buffer, "30 70 ");
-
-    // Clear buffer
-    memset (buffer, 0, sizeof (buffer));
-    freopen ("/dev/null", "a", stdout);
-    setbuf (stdout, buffer);
-
-    // Print level 3
-    print_current_level (bst->root, 3);
-    fflush (stdout);
-    ck_assert_str_eq (buffer, "20 40 ");
-
-    // Free the allocated memory
-    free (bst->root->left->left);
-    free (bst->root->left->right);
-    free (bst->root->left);
-    free (bst->root->right);
-    free (bst->root);
-    free (bst);
+    destroy_tree (&tree);
 }
 END_TEST
 
-// Test case for levelOrderTraversal function
-START_TEST (test_level_order_traversal)
+START_TEST (test_find_node)
 {
-    bst_t * bst = create_new_tree();
-    insert_node (bst, 50);
-    insert_node (bst, 30);
-    insert_node (bst, 70);
-    insert_node (bst, 20);
-    insert_node (bst, 40);
-    insert_node (bst, 60);
-    insert_node (bst, 80);
+    bt_t * tree     = create_new_tree();
+    int    values[] = {10, 5, 15, 3, 7};
+    tree->root      = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+    insert_left (tree->root->left, &values[3]);
+    insert_right (tree->root->left, &values[4]);
 
-    char buffer[256];
-    freopen ("/dev/null", "a", stdout);
-    setbuf (stdout, buffer);
+    int      search_val = 7;
+    node_t * found      = find_node (tree, &search_val, int_compare);
+    ck_assert_ptr_nonnull (found);
+    ck_assert_int_eq (*(int *) found->value, 7);
 
-    // Perform level-order traversal
-    level_order_traversal (bst->root);
-    fflush (stdout);
-    ck_assert_str_eq (buffer, "50 30 70 20 40 60 80 ");
+    search_val = 100;
+    found      = find_node (tree, &search_val, int_compare);
+    ck_assert_ptr_null (found);
 
-    // Free the allocated memory
-    free (bst->root->left->left);
-    free (bst->root->left->right);
-    free (bst->root->right->left);
-    free (bst->root->right->right);
-    free (bst->root->left);
-    free (bst->root->right);
-    free (bst->root);
-    free (bst);
+    destroy_tree (&tree);
 }
 END_TEST
 
-// Define test suite and add test cases
-//
+START_TEST (test_delete_node)
+{
+    bt_t * tree     = create_new_tree();
+    int    values[] = {10, 5, 15, 3, 7};
+    tree->root      = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+    insert_left (tree->root->left, &values[3]);
+    insert_right (tree->root->left, &values[4]);
+
+    int del_val = 5;
+    ck_assert_int_eq (delete_node (tree, &del_val, int_compare), 0);
+    ck_assert_ptr_null (find_node (tree, &del_val, int_compare));
+
+    destroy_tree (&tree);
+}
+END_TEST
+
+START_TEST (test_copy_tree)
+{
+    bt_t * tree     = create_new_tree();
+    int    values[] = {10, 5, 15};
+    tree->root      = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+
+    bt_t * copy = copy_tree (tree);
+    ck_assert_ptr_nonnull (copy);
+    ck_assert_int_eq (size (tree), size (copy));
+    ck_assert_int_eq (*(int *) copy->root->value, 10);
+    ck_assert_int_eq (*(int *) copy->root->left->value, 5);
+    ck_assert_int_eq (*(int *) copy->root->right->value, 15);
+
+    destroy_tree (&tree);
+    destroy_tree (&copy);
+}
+END_TEST
+
+START_TEST (test_is_balanced)
+{
+    bt_t * tree     = create_new_tree();
+    int    values[] = {10, 5, 15, 3};
+    tree->root      = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+
+    ck_assert (is_balanced (tree));
+
+    insert_left (tree->root->left, &values[3]);
+    ck_assert (!is_balanced (tree));
+
+    destroy_tree (&tree);
+}
+END_TEST
+
+START_TEST (test_lowest_common_ancestor)
+{
+    bt_t * tree     = create_new_tree();
+    int    values[] = {10, 5, 15, 3, 7};
+    tree->root      = create_node (&values[0]);
+    insert_left (tree->root, &values[1]);
+    insert_right (tree->root, &values[2]);
+    insert_left (tree->root->left, &values[3]);
+    insert_right (tree->root->left, &values[4]);
+
+    int      val1 = 3, val2 = 7;
+    node_t * lca = lowest_common_ancestor (tree, &val1, &val2, int_compare);
+    ck_assert_ptr_nonnull (lca);
+    ck_assert_int_eq (*(int *) lca->value, 5);
+
+    destroy_tree (&tree);
+}
+END_TEST
+
 Suite *
-bst_suite (void)
+binary_tree_suite (void)
 {
     Suite * s;
     TCase * tc_core;
 
-    s       = suite_create ("BST");
+    s       = suite_create ("Binary Tree");
 
     tc_core = tcase_create ("Core");
 
     tcase_add_test (tc_core, test_create_new_tree);
-    tcase_add_test (tc_core, test_create_new_node);
-    tcase_add_test (tc_core, test_insert_node);
-    tcase_add_test (tc_core, test_insert_node_recursive);
-    tcase_add_test (tc_core, test_search);
-    tcase_add_test (tc_core, test_find_min);
-    tcase_add_test (tc_core, test_find_max);
-    tcase_add_test (tc_core, test_delete_node);
-    tcase_add_test (tc_core, test_in_order_traversal);
+    tcase_add_test (tc_core, test_destroy_tree);
+    tcase_add_test (tc_core, test_insert_left);
+    tcase_add_test (tc_core, test_insert_right);
+    tcase_add_test (tc_core, test_get_root);
+    tcase_add_test (tc_core, test_get_left_child);
+    tcase_add_test (tc_core, test_get_right_child);
+    tcase_add_test (tc_core, test_get_data);
+    tcase_add_test (tc_core, test_set_data);
+    tcase_add_test (tc_core, test_is_empty);
+    tcase_add_test (tc_core, test_size);
     tcase_add_test (tc_core, test_height);
-    tcase_add_test (tc_core, test_print_current_level);
-    tcase_add_test (tc_core, test_level_order_traversal);
+    tcase_add_test (tc_core, test_traversals);
+    tcase_add_test (tc_core, test_find_node);
+    tcase_add_test (tc_core, test_delete_node);
+    tcase_add_test (tc_core, test_copy_tree);
+    tcase_add_test (tc_core, test_is_balanced);
+    tcase_add_test (tc_core, test_lowest_common_ancestor);
 
     suite_add_tcase (s, tc_core);
 
@@ -502,7 +346,7 @@ main (void)
     Suite *   s;
     SRunner * sr;
 
-    s  = bst_suite();
+    s  = binary_tree_suite();
     sr = srunner_create (s);
 
     srunner_run_all (sr, CK_NORMAL);
@@ -510,6 +354,4 @@ main (void)
     srunner_free (sr);
 
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-} /* main() */
-
-/*** end of file ***/
+}

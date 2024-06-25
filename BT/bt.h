@@ -1,6 +1,8 @@
 #ifndef BT_H
 #define BT_H
 
+#include <stdbool.h>
+
 typedef struct node {
     void * value;
     struct node * left;
@@ -11,47 +13,71 @@ typedef struct bt {
     node_t * root;
 } bt_t;
 
-bt_t * create_new_tree(void);
+static node_t * create_node (void * value);
 
-destroy_tree(bt_t * );
+static void destroy_node (node_t * node);
 
-insert_left();
+bt_t * create_new_tree (void);
 
-insert_right();
+void destroy_tree (bt_t ** tree);
 
-get_root();
+int insert_left (node_t * parent, void * value);
 
-get_left_child();
+int insert_right (node_t * parent, void * value);
 
-get_right_child();
+node_t * get_root (bt_t * tree);
 
-get_data();
+node_t * get_left_child (node_t * node);
 
-set_data();
+node_t * get_right_child (node_t * node);
 
-is_empty();
+void * get_data (node_t * node);
 
-size();
+int set_data (node_t * node, void * value);
 
-height();
+bool is_empty (bt_t * tree);
 
-void traverse_pre_order(bt_t * binary_tree);
+static size_t size_recursive (node_t * node);
 
-void traverse_in_order(bt_t * binary_tree);
+static size_t height_recursive (node_t * node);
 
-traverse_postorder();
+size_t size (bt_t * tree);
 
-traverse_levelorder();
+size_t height (bt_t * tree);
 
-find_node();
+void traverse_pre_order (node_t * node, void (*visit) (void *));
 
-delete_node();
+void traverse_in_order (node_t * node, void (*visit) (void *));
 
-copy_tree();
+void traverse_post_order (node_t * node, void (*visit) (void *));
 
-is_balanced();
+void traverse_level_order (bt_t * tree, void (*visit) (void *));
 
-lowest_common_ancestor();
+static node_t * find_node_recursive (node_t * node, void *   value,
+                                  int (*compare) (const void *, const void *));
 
+node_t * find_node (bt_t * tree,
+           void * value,
+           int (*compare) (const void *, const void *));
+
+static node_t * delete_node_recursive (node_t * node,
+                    void *   value,
+                    int (*compare) (const void *, const void *));
+
+delete_node (bt_t * tree, void * value, int (*compare) (const void *, 
+             const void *));
+
+static node_t * copy_node_recursive (node_t * node);
+
+bt_t * copy_tree (bt_t * tree);
+
+static int is_balanced_recursive (node_t * node, int * height);
+
+bool is_balanced (bt_t * tree);
+
+static node_t * lca_recursive (node_t * node, void *   value1,
+            void *   value2, int (*compare) (const void *, const void *));
+
+node_t * lowest_common_ancestor (bt_t * tree, void * value1, void * value2, int (*compare) (const void *, const void *))
 
 #endif
