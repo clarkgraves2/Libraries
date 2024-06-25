@@ -1,22 +1,11 @@
 #include "bt.h"
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-// Assuming you've defined these structures:
-typedef struct node
-{
-    void *        value;
-    struct node * left;
-    struct node * right;
-} node_t;
-
-typedef struct bt
-{
-    node_t * root;
-} bt_t;
+#include "queue.h"
 
 // Helper function to create a new node
-static node_t *
+node_t *
 create_node (void * value)
 {
     node_t * node = malloc (sizeof (node_t));
@@ -41,7 +30,7 @@ create_new_tree (void)
 }
 
 // Helper function for recursively destroying nodes
-static void
+void
 destroy_node (node_t * node)
 {
     if (node)
@@ -125,7 +114,7 @@ is_empty (bt_t * tree)
 }
 
 // Helper function for size
-static size_t
+size_t
 size_recursive (node_t * node)
 {
     if (!node)
@@ -140,7 +129,7 @@ size (bt_t * tree)
 }
 
 // Helper function for height
-static size_t
+size_t
 height_recursive (node_t * node)
 {
     if (!node)
@@ -190,11 +179,6 @@ traverse_post_order (node_t * node, void (*visit) (void *))
     }
 }
 
-// For level-order traversal, we'll need a queue
-// Assuming you have a queue implementation, otherwise you'd need to implement
-// one
-#include "queue.h"
-
 void
 traverse_level_order (bt_t * tree, void (*visit) (void *))
 {
@@ -219,7 +203,7 @@ traverse_level_order (bt_t * tree, void (*visit) (void *))
 }
 
 // Helper function for find_node
-static node_t *
+node_t *
 find_node_recursive (node_t * node,
                   void *   value,
                   int (*compare) (const void *, const void *))
@@ -239,11 +223,11 @@ find_node (bt_t * tree,
            void * value,
            int (*compare) (const void *, const void *))
 {
-    return tree ? find_node_helper (tree->root, value, compare) : NULL;
+    return tree ? find_node_recursive (tree->root, value, compare) : NULL;
 }
 
 // Helper function for delete_node
-static node_t *
+node_t *
 delete_node_recursive (node_t * node,
                     void *   value,
                     int (*compare) (const void *, const void *))
@@ -275,12 +259,12 @@ delete_node_recursive (node_t * node,
         while (temp->left)
             temp = temp->left;
         node->value = temp->value;
-        node->right = delete_node_helper (node->right, temp->value, compare);
+        node->right = delete_node_recursive (node->right, temp->value, compare);
     }
     else
     {
-        node->left  = delete_node_helper (node->left, value, compare);
-        node->right = delete_node_helper (node->right, value, compare);
+        node->left  = delete_node_recursive (node->left, value, compare);
+        node->right = delete_node_recursive (node->right, value, compare);
     }
     return node;
 }
@@ -292,12 +276,12 @@ delete_node (bt_t * tree,
 {
     if (!tree)
         return -1;
-    tree->root = delete_node_helper (tree->root, value, compare);
+    tree->root = delete_node_recursive (tree->root, value, compare);
     return 0;
 }
 
 // Helper function for copy_tree
-static node_t *
+node_t *
 copy_node_recursive (node_t * node)
 {
     if (!node)
@@ -325,55 +309,89 @@ copy_tree (bt_t * tree)
 }
 
 // Helper function for is_balanced
-static int
+int
 is_balanced_recursive (node_t * node, int * height)
 {
     if (!node)
     {
         *height = 0;
+        printf("Null node, height = 0\n");
         return 1;
     }
 
+    printf("Checking node with value: %d\n", node->data);
+
     int left_height, right_height;
-    if (!is_balanced_recursive (node->left, &left_height))
+    printf("Checking left child of %d\n", node->data);
+    int left_balanced = is_balanced_recursive(node->left, &left_height);
+    printf("Left subtree of %d: height = %d, balanced = %d\n", node->data, left_height, left_balanced);
+
+    if (!left_balanced)
         return 0;
-    if (!is_balanced_recursive (node->right, &right_height))
+
+    printf("Checking right child of %d\n", node->data);
+    int right_balanced = is_balanced_recursive(node->right, &right_height);
+    printf("Right subtree of %d: height = %d, balanced = %d\n", node->data, right_height, right_balanced);
+
+    if (!right_balanced)
         return 0;
 
     *height = 1 + (left_height > right_height ? left_height : right_height);
 
-    return (abs (left_height - right_height) <= 1);
+    int balance_factor = abs(left_height - right_height);
+    printf("Node %d: left_height = %d, right_height = %d, balance_factor = %d\n", 
+           node->data, left_height, right_height, balance_factor);
+
+    if (balance_factor > 1)
+    {
+        printf("Node %d is unbalanced\n", node->data);
+        return 0;
+    }
+
+    printf("Node %d is balanced\n", node->data);
+    return 1;
 }
 
 bool
 is_balanced (bt_t * tree)
 {
-    if (!tree)
+    if (!tree || !tree->root)
+    {
+        printf("Tree is empty, considered balanced\n");
         return true;
+    }
+    printf("Checking balance for tree with root value: %d\n", tree->root->data);
     int height;
-    return is_balanced_recursive (tree->root, &height);
+    bool result = is_balanced_recursive (tree->root, &height);
+    printf("Tree balance check result: %s\n", result ? "Balanced" : "Unbalanced");
+    return result;
 }
 
 // Helper function for lowest_common_ancestor
-static node_t *
+node_t *
 lca_recursive (node_t * node,
             void *   value1,
             void *   value2,
             int (*compare) (const void *, const void *))
 {
     if (!node)
+    {
         return NULL;
+    }
 
     if (compare (node->value, value1) == 0
         || compare (node->value, value2) == 0)
+    {
         return node;
+    }
 
     node_t * left_lca  = lca_recursive (node->left, value1, value2, compare);
     node_t * right_lca = lca_recursive (node->right, value1, value2, compare);
 
     if (left_lca && right_lca)
+    {
         return node;
-
+    }
     return left_lca ? left_lca : right_lca;
 }
 

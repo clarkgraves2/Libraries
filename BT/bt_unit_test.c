@@ -1,5 +1,6 @@
 #include "bt.h" // Assuming this is your header file
 #include <check.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 // Helper function for comparisons
@@ -76,7 +77,7 @@ START_TEST (test_get_root)
     tree->root   = create_node (&value);
 
     ck_assert_ptr_eq (get_root (tree), tree->root);
-    ck_assert_int_eq(*(int*)get_root(tree)->value), 10);
+    ck_assert_int_eq(*(int*)get_root(tree)->value, 10);
 
     destroy_tree (&tree);
 }
@@ -195,13 +196,13 @@ START_TEST (test_traversals)
     // Note: These tests will print to stdout, you'll need to visually verify
     // correctness
     printf ("Preorder: ");
-    traverse_preorder (tree->root, int_print);
+    traverse_pre_order (tree->root, int_print);
     printf ("\nInorder: ");
-    traverse_inorder (tree->root, int_print);
+    traverse_in_order (tree->root, int_print);
     printf ("\nPostorder: ");
-    traverse_postorder (tree->root, int_print);
+    traverse_post_order (tree->root, int_print);
     printf ("\nLevel-order: ");
-    traverse_levelorder (tree, int_print);
+    traverse_level_order (tree, int_print);
     printf ("\n");
 
     destroy_tree (&tree);

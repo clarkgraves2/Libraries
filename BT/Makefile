@@ -11,9 +11,9 @@ CLANG_FORMAT = clang-format
 CLANG_FORMAT_FLAGS = -i --style=file
 
 # Define the source files
-SRC = bt.c bt_unit_test.c
+SRC = bt.c bt_unit_test.c queue.c
 OBJ = $(SRC:.c=.o)
-DEPS = bt.h
+DEPS = bt.h queue.h
 
 # Define the executable name
 TARGET = bt_test
