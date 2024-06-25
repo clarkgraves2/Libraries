@@ -140,6 +140,131 @@ START_TEST(test_insert_at)
 }
 END_TEST
 
+START_TEST(test_delete_node)
+{
+    int sample_data = 42;
+    int sample_data2 = 8;
+    int sample_data3 = 27;
+
+    llist_t *test_list = create_list();
+
+    // Insert nodes into the list
+    node_t *inserted_node = insert_at(test_list, 0, &sample_data); 
+    ck_assert_ptr_nonnull(inserted_node);
+    ck_assert_int_eq(list_size(test_list), 1);
+    ck_assert_int_eq(*(int *)get_node_data(inserted_node), 42);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), NULL);
+
+    node_t *inserted_node2 = insert_at(test_list, 1, &sample_data2);
+    ck_assert_ptr_nonnull(inserted_node2);
+    ck_assert_int_eq(list_size(test_list), 2);
+    ck_assert_int_eq(*(int *)get_node_data(inserted_node2), 8);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node2), NULL);
+
+    node_t *inserted_node3 = insert_at(test_list, 1, &sample_data3);
+    ck_assert_ptr_nonnull(inserted_node3);
+    ck_assert_int_eq(list_size(test_list), 3);
+    ck_assert_int_eq(*(int *)get_node_data(inserted_node3), 27);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node3), inserted_node2);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), inserted_node3);
+
+    // Test deleting a middle node
+    int result = delete_node(test_list, &sample_data3);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(list_size(test_list), 2);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), inserted_node2);
+
+    // Test deleting the tail node
+    result = delete_node(test_list, &sample_data2);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(list_size(test_list), 1);
+    ck_assert_ptr_eq(test_list->head, inserted_node);
+    ck_assert_ptr_eq(test_list->tail, inserted_node);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), NULL);
+
+    // Test deleting the head node
+    result = delete_node(test_list, &sample_data);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(list_size(test_list), 0);
+    ck_assert_ptr_eq(test_list->head, NULL);
+    ck_assert_ptr_eq(test_list->tail, NULL);
+
+    // Clean up
+    free(inserted_node);
+    free(inserted_node2);
+    free(inserted_node3);
+    free(test_list);
+
+    inserted_node = NULL;
+    inserted_node2 = NULL;
+    inserted_node3 = NULL;
+    test_list = NULL;
+}
+END_TEST
+
+
+START_TEST(test_delete_node)
+{
+    int sample_data = 42;
+    int sample_data2 = 8;
+    int sample_data3 = 27;
+
+    llist_t *test_list = create_list();
+
+    // Insert nodes into the list
+    node_t *inserted_node = insert_at(test_list, 0, &sample_data); 
+    ck_assert_ptr_nonnull(inserted_node);
+    ck_assert_int_eq(list_size(test_list), 1);
+    ck_assert_int_eq(*(int *)get_node_data(inserted_node), 42);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), NULL);
+
+    node_t *inserted_node2 = insert_at(test_list, 1, &sample_data2);
+    ck_assert_ptr_nonnull(inserted_node2);
+    ck_assert_int_eq(list_size(test_list), 2);
+    ck_assert_int_eq(*(int *)get_node_data(inserted_node2), 8);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node2), NULL);
+
+    node_t *inserted_node3 = insert_at(test_list, 1, &sample_data3);
+    ck_assert_ptr_nonnull(inserted_node3);
+    ck_assert_int_eq(list_size(test_list), 3);
+    ck_assert_int_eq(*(int *)get_node_data(inserted_node3), 27);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node3), inserted_node2);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), inserted_node3);
+
+    // Test deleting a middle node
+    int result = delete_node(test_list, &sample_data3);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(list_size(test_list), 2);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), inserted_node2);
+
+    // Test deleting the tail node
+    result = delete_node(test_list, &sample_data2);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(list_size(test_list), 1);
+    ck_assert_ptr_eq(test_list->head, inserted_node);
+    ck_assert_ptr_eq(test_list->tail, inserted_node);
+    ck_assert_ptr_eq(get_next_ptr(inserted_node), NULL);
+
+    // Test deleting the head node
+    result = delete_node(test_list, &sample_data);
+    ck_assert_int_eq(result, 0);
+    ck_assert_int_eq(list_size(test_list), 0);
+    ck_assert_ptr_eq(test_list->head, NULL);
+    ck_assert_ptr_eq(test_list->tail, NULL);
+
+    // Clean up
+    free(inserted_node);
+    free(inserted_node2);
+    free(inserted_node3);
+    free(test_list);
+
+    inserted_node = NULL;
+    inserted_node2 = NULL;
+    inserted_node3 = NULL;
+    test_list = NULL;
+}
+END_TEST
+
 // Define test suite and add test cases
 //
 Suite *
@@ -158,7 +283,7 @@ linked_list_suite (void)
     tcase_add_test (tc_core, test_insert_front);
     tcase_add_test (tc_core, test_insert_back);
     tcase_add_test (tc_core, test_insert_at);
-
+    tcase_add_test (tc_core, test_delete_node);
 
     suite_add_tcase (s, tc_core);
 
