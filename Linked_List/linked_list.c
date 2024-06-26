@@ -84,7 +84,7 @@ node_t * insert_front(llist_t * list, void * data)
 
 node_t * insert_back (llist_t * list, void * data)
 {
-      if (NULL == list || NULL == data)
+    if (NULL == list || NULL == data)
     {
         return NULL;
     }
@@ -110,6 +110,82 @@ node_t * insert_back (llist_t * list, void * data)
     }
 
     return node_to_insert;
+}
+
+node_t * insert_at(llist_t * list, size_t position, void * data)
+{
+    if (NULL == list || NULL == data || 0 > position)
+    {
+        return NULL;
+    }
+
+    node_t * current_node = list->head;
+    node_t * node_to_insert = create_node(data);
+
+    if (0 == position || NULL == list->head || 0 == list_size(list))
+    {
+        return insert_front(list, data);
+    }
+
+    ssize_t size_of_list = list_size(list);
+    
+    if (position == size_of_list)
+    {
+        return insert_back(list, data);
+    }
+
+    for (size_t i = 0; i < position - 1; ++i) 
+    {
+        current_node = current_node->next;
+    }
+    node_to_insert->next = current_node->next;
+    current_node->next = node_to_insert;
+    (list->size)++;
+    return node_to_insert;
+}
+
+int delete_node(llist_t * list, void * data)
+{
+    if (NULL == list || NULL == data)
+    {
+        return -1;
+    }
+
+    node_t * current_node = list->head;
+    node_t * previous_node = NULL;
+
+    while (current_node != NULL)
+    {
+        if (current_node->data == data)
+        {
+            if (current_node == list->head)
+            {
+                list->head = current_node->next;
+                if (current_node == list->tail) 
+                {
+                    list->tail = NULL;
+                }
+                free(current_node);
+                (list->size)--;
+                return 0;
+            }
+
+            if (current_node->next == NULL)
+            {
+                list->tail = previous_node;
+            }
+
+            previous_node->next = current_node->next;
+            free(current_node);
+            (list->size)--;
+            return 0;
+        }
+
+        previous_node = current_node;
+        current_node = current_node->next;
+    }
+
+    return -1; // Node not found
 }
 
 void * get_node_data(node_t *node)
