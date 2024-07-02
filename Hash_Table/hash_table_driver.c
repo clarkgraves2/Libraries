@@ -8,27 +8,26 @@
 
 
 
-//START_TEST ( )
+START_TEST (create_hash_table)
 {
-
+    int size = 20;
+    hash_function * test_function;
+    hash_table_t * hash_table = create_hash_table(size, test_function);
 }
 END_TEST
 
-// Define test suite and add test cases
-//
 Suite *
 hash_table_suite (void)
 {
     Suite * s;
     TCase * tc_core;
 
-    //s       = suite_create (" ");
+    s       = suite_create ("hash_table.c");
 
-    tc_core = tcase_create ("Core");
+    tc_core = tcase_create ("create_hash_table()");
 
-    tcase_add_test (tc_core, insert_function);
+    tcase_add_test (tc_core, create_hash_table);
   
-
     suite_add_tcase (s, tc_core);
 
     return s;
