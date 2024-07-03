@@ -34,7 +34,7 @@ hash_table_t * create_hash_table(uint32_t size, hash_function * hash_func)
     if (NULL == hash_table->elements)
     {
         free(hash_table);
-        hash_table == NULL;
+        hash_table = NULL;
         return NULL;
     }
 

@@ -2,6 +2,7 @@
 #define HASH_TABLE_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * @brief Opaque hash table type.
