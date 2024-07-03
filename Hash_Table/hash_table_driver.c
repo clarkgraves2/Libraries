@@ -8,11 +8,13 @@
 
 
 
-START_TEST (create_hash_table)
+START_TEST (test_create_hash_table)
 {
     int size = 20;
-    hash_function * test_function;
+    hash_function * test_function = 0;
     hash_table_t * hash_table = create_hash_table(size, test_function);
+    ck_assert_ptr_nonnull (hash_table);
+    // Add ->Size Check and ->Elements Check
 }
 END_TEST
 
@@ -26,7 +28,7 @@ hash_table_suite (void)
 
     tc_core = tcase_create ("create_hash_table()");
 
-    tcase_add_test (tc_core, create_hash_table);
+    tcase_add_test (tc_core, test_create_hash_table);
   
     suite_add_tcase (s, tc_core);
 
