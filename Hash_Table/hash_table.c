@@ -133,6 +133,7 @@ void * hash_table_delete(hash_table_t * hash_table, const char * key)
     size_t index = hash_table_index(hash_table, key);
     node_t * tmp = hash_table->elements[index];
     node_t * prev = NULL;
+   
     while(tmp != NULL && strcmp(tmp->key, key) != 0)
     {
         prev = tmp;
