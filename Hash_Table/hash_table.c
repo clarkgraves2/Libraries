@@ -47,10 +47,22 @@ hash_table_t * create_hash_table(uint32_t size, hash_function * hash_func)
     return hash_table;
 }
 
-void destroy_hash_table(hash_table_t * table_to_destroy)
-{
+void destroy_hash_table(hash_table_t * table_to_destroy) {
+    for (uint32_t idx = 0; idx < table_to_destroy->size; idx++) {
+        node_t * tmp = table_to_destroy->elements[idx];
+        while (tmp != NULL) {
+            node_t * next = tmp->next;
+            free(tmp->key);
+            tmp->key = NULL;
+            free(tmp);
+            tmp = NULL;
+            tmp = next;
+        }
+    }
     free(table_to_destroy->elements);
+    table_to_destroy->elements = NULL;
     free(table_to_destroy);
+    table_to_destroy = NULL;
 }
 
 bool hash_table_insert(hash_table_t * hash_table, const char * key, void * object)
@@ -68,8 +80,21 @@ bool hash_table_insert(hash_table_t * hash_table, const char * key, void * objec
     }
 
     node_t * entry = malloc(sizeof(*entry));
+    
+    if (NULL == entry) 
+    {
+        return false;
+    }   
+
     entry->object = object;
-    entry->key = malloc(strlen((key)+1));
+    entry->key = malloc(strlen(key) + 1);
+    
+    if (NULL == entry->key) 
+    {
+        free(entry);
+        return false;
+    }
+    
     strcpy(entry->key, key);
 
     entry->next = hash_table->elements[index];
@@ -81,7 +106,7 @@ void * hash_table_lookup(hash_table_t * table_to_lookup, const char * key)
 {
     if (NULL == key || NULL == table_to_lookup)
     {
-        return false;
+        return NULL;
     }
     
     size_t index = hash_table_index(table_to_lookup, key);
@@ -102,7 +127,7 @@ void * hash_table_delete(hash_table_t * hash_table, const char * key)
 {
      if (NULL == key || NULL == hash_table)
     {
-        return false;
+        return NULL;
     }
     
     size_t index = hash_table_index(hash_table, key);
@@ -113,10 +138,12 @@ void * hash_table_delete(hash_table_t * hash_table, const char * key)
         prev = tmp;
         tmp = tmp->next;
     }
+
     if (NULL == tmp)
     {
         return NULL;
     }
+
     if (NULL == prev)
     {
         hash_table->elements[index] = tmp->next;
@@ -128,7 +155,12 @@ void * hash_table_delete(hash_table_t * hash_table, const char * key)
     }
     
     void * result = tmp->object;
+    free(tmp->key);
+    tmp->key = NULL;
+    
     free(tmp);
+    tmp = NULL;
+    
     return result;
 }
 
@@ -155,3 +187,80 @@ void print_hash_table(hash_table_t * table_to_print)
     }
     printf("End Table\n");
 }
+
+bool hash_table_update(hash_table_t * hash_table, const char * key, void * new_object) {
+    if (NULL == key || NULL == new_object || NULL == hash_table) {
+        return false;
+    }
+    size_t index = hash_table_index(hash_table, key);
+    node_t * tmp = hash_table->elements[index];
+    while (tmp != NULL && strcmp(tmp->key, key) != 0) {
+        tmp = tmp->next;
+    }
+    if (tmp == NULL) {
+        return false;
+    }
+    tmp->object = new_object;
+    return true;
+}
+
+bool hash_table_resize(hash_table_t * hash_table, uint32_t new_size) {
+    hash_table_t * new_table = create_hash_table(new_size, hash_table->hash);
+    if (new_table == NULL) {
+        return false;
+    }
+    for (uint32_t idx = 0; idx < hash_table->size; idx++) {
+        node_t * tmp = hash_table->elements[idx];
+        while (tmp != NULL) {
+            hash_table_insert(new_table, tmp->key, tmp->object);
+            tmp = tmp->next;
+        }
+    }
+    destroy_hash_table(hash_table);
+    *hash_table = *new_table;
+    free(new_table);
+    return true;
+}
+
+void hash_table_clear(hash_table_t * hash_table) {
+    for (uint32_t idx = 0; idx < hash_table->size; idx++) {
+        node_t * tmp = hash_table->elements[idx];
+        while (tmp != NULL) {
+            node_t * next = tmp->next;
+            free(tmp->key);
+            free(tmp);
+            tmp = next;
+        }
+        hash_table->elements[idx] = NULL;
+    }
+}
+
+float hash_table_get_load_factor(hash_table_t * hash_table) {
+    if (hash_table == NULL) return 0.0f;
+    int count = 0;
+    for (uint32_t i = 0; i < hash_table->size; i++) {
+        node_t * tmp = hash_table->elements[i];
+        while (tmp != NULL) {
+            count++;
+            tmp = tmp->next;
+        }
+    }
+    return (float)count / hash_table->size;
+}
+
+char ** hash_table_get_keys(hash_table_t * hash_table, int * key_count) {
+    if (hash_table == NULL || key_count == NULL) return NULL;
+    *key_count = 0;
+    char ** keys = NULL;
+    for (uint32_t i = 0; i < hash_table->size; i++) {
+        node_t * tmp = hash_table->elements[i];
+        while (tmp != NULL) {
+            keys = realloc(keys, (*key_count + 1) * sizeof(char *));
+            keys[*key_count] = strdup(tmp->key);
+            (*key_count)++;
+            tmp = tmp->next;
+        }
+    }
+    return keys;
+}
+
