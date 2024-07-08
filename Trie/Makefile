@@ -11,12 +11,12 @@ CLANG_FORMAT = clang-format
 CLANG_FORMAT_FLAGS = -i --style=file
 
 # Define the source files
-SRC = hash_table.c hash_table_driver.c
+SRC = trie.c
 OBJ = $(SRC:.c=.o)
-DEPS = hash_table.h
+DEPS = trie.h
 
 # Define the executable name
-TARGET = hash_table_test
+TARGET = trie_test
 
 # Rule to build the target
 $(TARGET): $(OBJ)
@@ -40,7 +40,7 @@ debug: $(TARGET)
 	gdb ./$(TARGET)
 
 tidy:
-	clang-tidy queue.c -- $(CFLAGS) $(CHECK_CFLAGS) $(STANDARD) $(FEATURES)
+	clang-tidy trie.c -- $(CFLAGS) $(CHECK_CFLAGS) $(STANDARD) $(FEATURES)
 
 
 format:

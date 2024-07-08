@@ -101,6 +101,76 @@ bool trie_search(trie_node_t * root, char * signedtext)
     return tmp->terminal;
 }
 
+bool node_has_children(trie_node_t * node)
+{
+    if (NULL == node)
+    {
+        return false;
+    }
+
+    for (int mdx =0; mdx <NUM_CHARS; mdx++)
+    {
+        if (node->children[mdx] != NULL)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+trie_node_t * delete_str_recursive(trie_node_t * node, unsigned char * text, bool * deleted)
+{
+    if (NULL == node)
+    {
+        return node;
+    }
+
+    if (*text == '\0')
+    {
+        if (node->terminal)
+        {
+            node->terminal = false;
+            *deleted = true;
+        
+        
+            if (false == node_has_children(node))
+            {
+                free(node);
+                node = NULL;
+            }
+        }
+        return node;
+    }    
+
+   node->children[text[0]] = delete_str_recursive(node->children[text[0]],text + 1, deleted);
+
+   if (false == *deleted && node_has_children(node) && false == node->terminal)
+   {
+    free(node);
+    node = NULL;
+   }
+   return node;
+}
+
+
+
+bool delete_str(trie_node_t ** root, char * signed_text)
+{
+    unsigned char * text = (unsigned char *)signed_text;
+    bool result = false;
+
+    if (NULL == *root)
+    {
+        return false;
+    }
+
+    *root = delete_str_recursive(*root, text, &result);
+    return result;
+}
+
+
 int main()
 {
     trie_node_t * root = NULL;
@@ -110,11 +180,18 @@ int main()
     trie_insert(&root, "KIN");
     trie_insert(&root, "CAT");
     trie_insert(&root, "HAPPY");
+
     print_trie(root);
 
     printf("Search for CATTLE: %d\n", trie_search(root, "CATLE"));
     printf("Search for CATTLE: %d\n", trie_search(root, "CATTLE"));
     printf("Search for CATTLE: %d\n", trie_search(root, "KITTEN"));
     printf("Search for CATTLE: %d\n", trie_search(root, "HAPPY"));
+
+    delete_str(&root, "KIN");
+    delete_str(&root, "CAT");
+
+    print_trie(root);
+
 }
 
