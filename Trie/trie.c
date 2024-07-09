@@ -4,6 +4,7 @@
 #include <string.h>
 
 #define NUM_CHARS 256
+#define ALPHA_CHARS 26
 
 typedef struct trie_node{
     bool terminal;
@@ -133,25 +134,26 @@ trie_node_t * delete_str_recursive(trie_node_t * node, unsigned char * text, boo
         {
             node->terminal = false;
             *deleted = true;
-        
-        
-            if (false == node_has_children(node))
-            {
-                free(node);
-                node = NULL;
-            }
         }
+
+        if (false == node_has_children(node))
+        {
+            free(node);
+            node = NULL;
+        }
+
         return node;
     }    
 
-   node->children[text[0]] = delete_str_recursive(node->children[text[0]],text + 1, deleted);
+    node->children[text[0]] = delete_str_recursive(node->children[text[0]], text + 1, deleted);
 
-   if (false == *deleted && node_has_children(node) && false == node->terminal)
-   {
-    free(node);
-    node = NULL;
-   }
-   return node;
+    if (*deleted && !node_has_children(node) && !node->terminal)
+    {
+        free(node);
+        node = NULL;
+    }
+
+    return node;
 }
 
 
@@ -168,6 +170,23 @@ bool delete_str(trie_node_t ** root, char * signed_text)
 
     *root = delete_str_recursive(*root, text, &result);
     return result;
+}
+
+int find_root_size(trie_node_t *root)
+{
+    if (!root)
+    {
+        return 0;
+    }
+
+    int size = 1; // Count the root itself
+
+    for (int i = 0; i < ALPHA_CHARS; ++i)
+    {
+        size += find_root_size(root->children[i]);
+    }
+
+    return size;
 }
 
 
