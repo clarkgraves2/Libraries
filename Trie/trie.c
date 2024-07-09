@@ -31,9 +31,9 @@ bool trie_insert (trie_node_t **root, char * signed_text)
 
     unsigned char * text = (unsigned char *)signed_text;
     trie_node_t * tmp = *root;
-    int legnth = strlen(signed_text);
+    int length = strlen(signed_text);
 
-    for (int jdx = 0; jdx <legnth; jdx++)
+    for (int jdx = 0; jdx <length; jdx++)
     {
         if (NULL == tmp->children[text[jdx]])
         {
@@ -194,18 +194,18 @@ int main()
 {
     trie_node_t * root = NULL;
 
-    trie_insert(&root, "KIT");
-    trie_insert(&root, "CATTLE");
-    trie_insert(&root, "KIN");
-    trie_insert(&root, "CAT");
-    trie_insert(&root, "HAPPY");
+    trie_insert(&root, "pickle");
+    // trie_insert(&root, "pickles");
+    trie_insert(&root, "pic");
+    trie_insert(&root, "picket");
+ 
 
     print_trie(root);
 
-    printf("Search for CATTLE: %d\n", trie_search(root, "CATLE"));
-    printf("Search for CATTLE: %d\n", trie_search(root, "CATTLE"));
-    printf("Search for CATTLE: %d\n", trie_search(root, "KITTEN"));
-    printf("Search for CATTLE: %d\n", trie_search(root, "HAPPY"));
+    printf("Search for pickle: %d\n", trie_search(root, "pickle"));
+    printf("Search for pickles: %d\n", trie_search(root, "pickles"));
+    printf("Search for pic: %d\n", trie_search(root, "pic"));
+    printf("Search for picture: %d\n", trie_search(root, "picture"));
 
     delete_str(&root, "KIN");
     delete_str(&root, "CAT");
