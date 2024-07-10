@@ -11,12 +11,12 @@ CLANG_FORMAT = clang-format
 CLANG_FORMAT_FLAGS = -i --style=file
 
 # Define the source files
-SRC = p_trie.c
+SRC = p_trie.c 
 OBJ = $(SRC:.c=.o)
 DEPS = p_trie.h
 
 # Define the executable name
-TARGET = p_trie
+TARGET = p_trie_test
 
 # Rule to build the target
 $(TARGET): $(OBJ)

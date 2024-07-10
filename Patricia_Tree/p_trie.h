@@ -10,8 +10,14 @@ bool insert_node (const char * string, patricia_tree_t * tree);
 
 pat_node_t *find_child_with_prefix(pat_node_t *node, const char *prefix);
 
-void print_patricia_tree (pat_node_t * node, char * prefix);
+void print_patricia_tree (pat_node_t * node, const char * prefix);
 
 bool trie_contains(patricia_tree_t *tree, const char *string);
+
+void free_patricia_tree(pat_node_t *node);
+
+char *str_duplicate(const char *str);
+
+char *str_n_duplicate(const char *str, size_t n);
 
 #endif /* PATRICIA_TREE_H */
