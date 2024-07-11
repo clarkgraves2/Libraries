@@ -40,26 +40,121 @@ patricia_tree_t *create_patricia_tree(void) {
     return tree;
 }
 
+pat_node_t * create_node(const char *key, pat_node_t *parent, bool str_complete) {
+    // Allocate memory for the new node
+    pat_node_t *new_node = calloc(1, sizeof(pat_node_t));
+    if (new_node == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Allocate memory and copy the key
+    new_node->key = malloc(strlen(key) + 1);
+    if (new_node->key == NULL) {
+        fprintf(stderr, "Memory allocation for key failed\n");
+        free(new_node);
+        exit(EXIT_FAILURE);
+    }
+    strcpy(new_node->key, key);
+
+    // Allocate or reallocate memory for the parent's children array
+    parent->children = realloc(parent->children, (parent->num_of_children + 1) * sizeof(pat_node_t *));
+    if (parent->children == NULL) {
+        fprintf(stderr, "Memory allocation for children array failed\n");
+        free(new_node->key);
+        free(new_node);
+        exit(EXIT_FAILURE);
+    }
+
+    // Add the new node to the parent's children array
+    parent->children[parent->num_of_children] = new_node;
+    parent->num_of_children++;
+
+    // Initialize the new node
+    new_node->parent = parent;
+    new_node->children = NULL; 
+    new_node->str_complete = str_complete;
+    new_node->num_of_children = 0;
+
+    return new_node;
+}
+
 // Function to insert a new node into the Patricia Tree
-bool insert_node(const char *string, patricia_tree_t *tree) {
+bool insert_node(const char *string, patricia_tree_t *tree) 
+{
     if (tree == NULL || string == NULL) {
         return false;
     }
 
-    pat_node_t *current_node = tree->root;
-    const char *remaining_key = string;
-
-    while (*remaining_key)
-    {
-
-    }
-        
-}
-
-int index_of_difference(const char * string, const * node_key)
-{
+    pat_node_t * current_node = tree->root;
+    const char *insert_string = string;
     
+    if (NULL == current_node->children)
+    {
+        create_node(string, current_node, true);
+        current_node->num_of_children++;
+        return true;
+    }
+
+
+    for (int i = 0; i < current_node->num_of_children; i++) 
+    {
+        pat_node_t *child = current_node->children[i];
+
+        int diff_index = index_of_difference(insert_string, child->key);
+
+        if (diff_index == -1)
+        {
+            return false;
+        }
+        
+        if (diff_index == 0)
+        {
+            continue;;
+        }
+        else
+        {
+        int input_string_length = strlen(insert_string);
+        int node_key_length = strlen(child->key);
+
+        if (node_key_length < insert_string)
+        {
+        insert_rem_chars_as_node(diff_index, insert_string, child);
+        }
+        else
+        {
+        swap_nodes(insert_string, child, current_node);
+        }
+
+        return true;
+        }
+    }
+
+    return false;
 }
+
+int index_of_difference(const char * string, const char * node_key)
+{
+   int index = 0;
+
+    // Compare each character of both strings until a difference is found
+    while (string[index] != '\0' && node_key[index] != '\0') 
+    {
+        if (string[index] != node_key[index]) {
+            return index;
+        }
+        index++;
+    }
+
+    // Check if the strings are of different lengths
+    if (string[index] != node_key[index]) {
+        return index;
+    }
+
+    // Return -1 if no difference is found
+    return -1;
+}
+
 
 // Function to print the Patricia Tree
 void print_patricia_tree(pat_node_t *node, const char *prefix) {
