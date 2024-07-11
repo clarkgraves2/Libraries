@@ -6,18 +6,26 @@ typedef struct pat_node pat_node_t;
 
 patricia_tree_t * create_patricia_tree (void);
 
-bool insert_node (const char * string, patricia_tree_t * tree);
+pat_node_t * create_node(char *key, pat_node_t *parent);
 
-pat_node_t *find_child_with_prefix(pat_node_t *node, const char *prefix);
+bool insert_node(const char * string,  pat_node_t * current_node);
 
-void print_patricia_tree (pat_node_t * node, const char * prefix);
+bool insert_node_helper(char * string, pat_node_t * current_node);   
 
-bool trie_contains(patricia_tree_t *tree, const char *string);
+char * remaining_string_from_index(const char* string, size_t diff_index);
+
+char* create_new_string_from_index(char* string, size_t diff_index);
+
+void truncate_string(char* string, int new_length);
+
+void prefix_breakdown(pat_node_t * current_node, size_t diff_index);
+
+size_t index_of_difference(const char *string1, const char *string2);
+
+void print_patricia_tree(pat_node_t *node, int level);
 
 void free_patricia_tree(pat_node_t *node);
 
-char *str_duplicate(const char *str);
-
-char *str_n_duplicate(const char *str, size_t n);
+char* string_duplicate(const char* str);
 
 #endif /* PATRICIA_TREE_H */
