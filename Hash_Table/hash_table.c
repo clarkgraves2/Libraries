@@ -9,13 +9,13 @@ typedef struct node
     char * key;
     void * object;
     struct node * next;
-}node;
+}ht_node_t;
 
 typedef struct hash_table
 {
     uint32_t size;
     hash_function * hash;
-    node ** elements;
+    ht_node_t ** elements;
 }hash_table;
 
 static size_t hash_table_index(hash_table_t * hash_table, const char * key)
@@ -35,7 +35,7 @@ hash_table_t * create_hash_table(uint32_t size, hash_function * hash_func)
 
     hash_table->size = size;
     hash_table->hash = hash_func;
-    hash_table->elements = calloc(hash_table->size, sizeof(node_t));
+    hash_table->elements = calloc(hash_table->size, sizeof(ht_node_t));
 
     if (NULL == hash_table->elements)
     {
@@ -49,9 +49,9 @@ hash_table_t * create_hash_table(uint32_t size, hash_function * hash_func)
 
 void destroy_hash_table(hash_table_t * table_to_destroy) {
     for (uint32_t idx = 0; idx < table_to_destroy->size; idx++) {
-        node_t * tmp = table_to_destroy->elements[idx];
+        ht_node_t * tmp = table_to_destroy->elements[idx];
         while (tmp != NULL) {
-            node_t * next = tmp->next;
+            ht_node_t * next = tmp->next;
             free(tmp->key);
             tmp->key = NULL;
             free(tmp);
@@ -79,7 +79,7 @@ bool hash_table_insert(hash_table_t * hash_table, const char * key, void * objec
         return false;
     }
 
-    node_t * entry = malloc(sizeof(*entry));
+    ht_node_t * entry = malloc(sizeof(*entry));
     
     if (NULL == entry) 
     {
@@ -110,7 +110,7 @@ void * hash_table_lookup(hash_table_t * table_to_lookup, const char * key)
     }
     
     size_t index = hash_table_index(table_to_lookup, key);
-    node_t * tmp = table_to_lookup->elements[index];
+    ht_node_t * tmp = table_to_lookup->elements[index];
 
     while(tmp != NULL && strcmp(tmp->key, key) != 0)
     {
@@ -131,8 +131,8 @@ void * hash_table_delete(hash_table_t * hash_table, const char * key)
     }
     
     size_t index = hash_table_index(hash_table, key);
-    node_t * tmp = hash_table->elements[index];
-    node_t * prev = NULL;
+    ht_node_t * tmp = hash_table->elements[index];
+    ht_node_t * prev = NULL;
    
     while(tmp != NULL && strcmp(tmp->key, key) != 0)
     {
@@ -177,7 +177,7 @@ void print_hash_table(hash_table_t * table_to_print)
         else
         {
             printf("\t%i\t\n",idx);
-            node_t * tmp = table_to_print->elements[idx];
+            ht_node_t * tmp = table_to_print->elements[idx];
             while(NULL != tmp)
             {
                 printf("\"%s\"(%p) - ", tmp->key, tmp->object);
@@ -194,7 +194,7 @@ bool hash_table_update(hash_table_t * hash_table, const char * key, void * new_o
         return false;
     }
     size_t index = hash_table_index(hash_table, key);
-    node_t * tmp = hash_table->elements[index];
+    ht_node_t * tmp = hash_table->elements[index];
     while (tmp != NULL && strcmp(tmp->key, key) != 0) {
         tmp = tmp->next;
     }
@@ -211,7 +211,7 @@ bool hash_table_resize(hash_table_t * hash_table, uint32_t new_size) {
         return false;
     }
     for (uint32_t idx = 0; idx < hash_table->size; idx++) {
-        node_t * tmp = hash_table->elements[idx];
+        ht_node_t * tmp = hash_table->elements[idx];
         while (tmp != NULL) {
             hash_table_insert(new_table, tmp->key, tmp->object);
             tmp = tmp->next;
@@ -225,9 +225,9 @@ bool hash_table_resize(hash_table_t * hash_table, uint32_t new_size) {
 
 void hash_table_clear(hash_table_t * hash_table) {
     for (uint32_t idx = 0; idx < hash_table->size; idx++) {
-        node_t * tmp = hash_table->elements[idx];
+        ht_node_t * tmp = hash_table->elements[idx];
         while (tmp != NULL) {
-            node_t * next = tmp->next;
+            ht_node_t * next = tmp->next;
             free(tmp->key);
             free(tmp);
             tmp = next;
@@ -240,7 +240,7 @@ float hash_table_get_load_factor(hash_table_t * hash_table) {
     if (hash_table == NULL) return 0.0f;
     int count = 0;
     for (uint32_t i = 0; i < hash_table->size; i++) {
-        node_t * tmp = hash_table->elements[i];
+        ht_node_t * tmp = hash_table->elements[i];
         while (tmp != NULL) {
             count++;
             tmp = tmp->next;
@@ -254,7 +254,7 @@ char ** hash_table_get_keys(hash_table_t * hash_table, int * key_count) {
     *key_count = 0;
     char ** keys = NULL;
     for (uint32_t i = 0; i < hash_table->size; i++) {
-        node_t * tmp = hash_table->elements[i];
+        ht_node_t * tmp = hash_table->elements[i];
         while (tmp != NULL) {
             keys = realloc(keys, (*key_count + 1) * sizeof(char *));
             keys[*key_count] = strdup(tmp->key);

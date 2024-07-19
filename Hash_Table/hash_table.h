@@ -9,7 +9,7 @@
  * @brief Opaque hash table type.
  */
 typedef struct hash_table hash_table_t;
-typedef struct node node_t;
+typedef struct node ht_node_t;
 
 typedef uint64_t hash_function (const char *, size_t);
 

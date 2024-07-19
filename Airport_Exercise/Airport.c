@@ -1,17 +1,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <regex.h>
-#include "./Hash_Table/hash_table.h"
-#include "./Linked_List/linked_list.h"
+#include "../Hash_Table/hash_table.h"
+#include "../Linked_List/linked_list.h"
 
 #define MAX_AIRPORTS (100)
 #define FILE_ERROR (0)
 #define LINE_SIZE (11)
 
+uint64_t simple_hash(const char *str, size_t size);
+
 typedef struct airport
 {
     const char * name;
-    airport_t * connection;
+    struct airport_t * connection;
 }airport_t;
 
 int 
@@ -26,16 +28,15 @@ if (NULL == fptr)
 }
 
 regex_t regex;
-int input_val;
-int ret;
 
 if (regcomp(&regex, "[A-Z]{3} -- [A-Z]{3}", 0)) 
 {
         fprintf(stderr, "Could not compile regex\n");
         return 1;
 }
+uint32_t size = 100;
 
-hash_table_t * hashtable = create_hash_table(MAX_AIRPORTS, simple_hash);
+hash_table_t * airport_htable = create_hash_table(size, simple_hash);
 
 char buffer[LINE_SIZE];
 
@@ -53,8 +54,15 @@ char buffer[LINE_SIZE];
             // If it matches, use sscanf to extract values
             if (sscanf(buffer, "%s -- %s", flight1, flight2) == 2) 
             {
-                hash_table_insert()
+                if(NULL == hash_table_lookup(airport_htable, flight1))
+                {
+                    hash_table_insert(airport_htable, flight1, NULL);
+                }
 
+                if(NULL == hash_table_lookup(airport_htable, flight2))
+                {
+                    hash_table_insert(airport_htable, flight2, NULL);
+                }
 
             } 
             else 
@@ -68,10 +76,20 @@ char buffer[LINE_SIZE];
         }
     }
 
-
+    print_hash_table(airport_htable);
 
     fclose(fptr);
     regfree(&regex);
     return 0;
 }
 
+uint64_t simple_hash(const char *str, size_t size) 
+{
+    uint64_t hash = 5381;
+    int c;
+
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash % size;
+}

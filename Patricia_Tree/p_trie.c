@@ -324,14 +324,16 @@ int main() {
 
     // Test strings
     const char *test_strings[] = {
-        "romane",
-        "romanus",
-        "romulus",
-        "rubens",
-        "ruber",
-        "rubicon",
-        "rubicundus"
+        "picket",
+        "pickle",
+        "predate",
+        "preview",
+        "pickles",
+        "pick",
+        "pickling",
+        "picture"
     };
+    
     int num_strings = sizeof(test_strings) / sizeof(test_strings[0]);
 
     // Insert strings into the tree
