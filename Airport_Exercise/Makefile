@@ -11,7 +11,7 @@ CLANG_FORMAT = clang-format
 CLANG_FORMAT_FLAGS = -i --style=file
 
 # Define the source files
-SRC = Airport.c 
+SRC = Airport.c ../Hash_Table/hash_table.c
 OBJ = $(SRC:.c=.o)
 DEPS = ../Hash_Table/hash_table.h
 
