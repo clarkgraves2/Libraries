@@ -14,7 +14,7 @@ typedef struct node node_t;
  * @param void Nothing is needed to pass to create list.
  * @return Valid pointer on success, anything else failure.
  */
-llist_t * create_list(void);
+llist_t * llist_create(void);
 
 /**
  * @brief Tracks size of the linked list
@@ -28,7 +28,7 @@ ssize_t list_size(llist_t * llist);
  * @param data Void pointer to data type held by list
  * @return Valid pointer on success, NULL on failure.
  */
-node_t * create_node(void * data);
+node_t * llist_create_node(void * data);
 
 /**
  * @brief Inserts a node with value to front of list

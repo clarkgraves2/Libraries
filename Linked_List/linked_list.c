@@ -17,7 +17,7 @@ struct llist
     ssize_t size;
 };
 
-llist_t * create_list(void)
+llist_t * llist_create(void)
 {
     llist_t * new_list = calloc(1,sizeof(llist_t));
 
@@ -39,7 +39,7 @@ ssize_t list_size(llist_t * llist)
     return llist->size;
 }
 
-node_t * create_node(void * data)
+node_t * llist_create_node(void * data)
 {
     node_t * new_node = calloc(1,sizeof(node_t));
 

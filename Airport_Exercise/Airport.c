@@ -50,7 +50,6 @@ int main(void)
     }
 
     char buffer[LINE_SIZE];
-    size_t  size   = 0;
     ssize_t len    = 0;
 
     while (fgets(buffer, sizeof(buffer), fptr)) 

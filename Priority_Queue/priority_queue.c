@@ -192,8 +192,6 @@ static void pqueue_heapify_down(pqueue_t *pqueue, int index)
     }
 }
 
-
- 
 static bool pqueue_resize(pqueue_t *pqueue)
 {
     int new_capacity = pqueue->capacity * 2;

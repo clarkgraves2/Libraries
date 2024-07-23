@@ -3,262 +3,298 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 typedef struct ht_node
 {
-    char *        key;
-    void *        object;
-    struct node * next;
+    char *            key;
+    void *            object;
+    struct ht_node *  next;
 } ht_node_t;
 
 typedef struct hash_table
 {
-    uint32_t        size;
-    hash_function * hash;
-    ht_node_t **    elements;
-} hash_table;
+    size_t            size;
+    size_t            count;
+    double            load_factor;
+    hash_function *   hash;
+    ht_node_t **      elements;
+} hash_table_t;
 
-static size_t
-hash_table_index (hash_table_t * hash_table, const char * key)
+#define DEFAULT_INITIAL_SIZE 16
+#define DEFAULT_LOAD_FACTOR 0.75
+
+hash_table_t * 
+hash_table_create(size_t initial_size, double load_factor, hash_function* hash_func) 
 {
-    size_t result = (hash_table->hash (key, strlen (key)) % (hash_table->size));
-    return result;
-}
+    if (0 == initial_size)
+    {
+        initial_size = DEFAULT_INITIAL_SIZE;
+    }
 
-hash_table_t *
-create_hash_table (uint32_t size, hash_function * hash_func)
-{
-    hash_table_t * hash_table = malloc (sizeof (hash_table_t));
+    if (load_factor <= 0 || load_factor >= 1) 
+    {
+        load_factor = DEFAULT_LOAD_FACTOR;
+    }
 
-    if (NULL == hash_table)
+    if (NULL == hash_func)
     {
         return NULL;
     }
 
-    hash_table->size     = size;
-    hash_table->hash     = hash_func;
-    hash_table->elements = calloc (hash_table->size, sizeof (ht_node_t));
-
-    if (NULL == hash_table->elements)
+    hash_table_t * table = (hash_table_t*)malloc(sizeof(hash_table_t));
+    
+    if (NULL == table) 
     {
-        free (hash_table);
-        hash_table = NULL;
-        return NULL;
+        return NULL;  
     }
 
-    return hash_table;
+    table->elements = (ht_node_t**)calloc(initial_size, sizeof(ht_node_t*));
+    
+    if (NULL == table->elements) 
+    {
+        free(table);
+        return NULL;  
+    }
+
+    table->size = initial_size;
+    table->count = 0;
+    table->load_factor = load_factor;
+    table->hash = hash_func;
+
+    return table;
 }
 
-void
-destroy_hash_table (hash_table_t * table_to_destroy)
+void 
+hash_table_destroy(hash_table_t* table) 
 {
-    for (uint32_t idx = 0; idx < table_to_destroy->size; idx++)
+    if (NULL == table) 
     {
-        ht_node_t * tmp = table_to_destroy->elements[idx];
-        while (tmp != NULL)
+        return;
+    }
+    
+    for (size_t idx = 0; idx < table->size; idx++) 
+    {
+        ht_node_t* node = table->elements[idx];
+        
+        while (node != NULL) 
         {
-            ht_node_t * next = tmp->next;
-            free (tmp->key);
-            tmp->key = NULL;
-            free (tmp);
-            tmp = NULL;
-            tmp = next;
+            ht_node_t* next = node->next;
+            free(node->key);
+            free(node);
+            node = next;
         }
     }
-    free (table_to_destroy->elements);
-    table_to_destroy->elements = NULL;
-    free (table_to_destroy);
-    table_to_destroy = NULL;
+    
+    free(table->elements);
+    free(table);
 }
 
-bool
-hash_table_insert (hash_table_t * hash_table, const char * key, void * object)
+bool 
+hash_table_insert(hash_table_t* table, const char* key, void* value) 
 {
-    if (NULL == key || NULL == object || NULL == hash_table)
+    if (table == NULL || key == NULL) 
     {
         return false;
     }
-
-    size_t index = hash_table_index (hash_table, key);
-
-    if (hash_table_lookup (hash_table, key) != NULL)
+    
+    void* existing_value;
+    if (hash_table_lookup(table, key, &existing_value)) 
+    {
+    
+        return hash_table_update(table, key, value);
+    }
+    
+    // Key doesn't exist, proceed with insertion
+    if ((double)(table->count + 1) / table->size > table->load_factor) 
+    {
+        if (!hash_table_resize(table, table->size * 2)) 
+        {
+            return false;
+        }
+    }
+    
+    size_t index = table->hash(key) % table->size;
+    ht_node_t* new_node = (ht_node_t*)malloc(sizeof(ht_node_t));
+    if (new_node == NULL) 
     {
         return false;
     }
-
-    ht_node_t * entry = malloc (sizeof (*entry));
-
-    if (NULL == entry)
-    {
-        return false;
-    }
-
-    entry->object = object;
-    entry->key    = malloc (strlen (key) + 1);
-
-    if (NULL == entry->key)
-    {
-        free (entry);
-        return false;
-    }
-
-    strcpy (entry->key, key);
-
-    entry->next                 = hash_table->elements[index];
-    hash_table->elements[index] = entry;
+    
+    new_node->key = strdup(key);
+    new_node->object = value;
+    new_node->next = table->elements[index];
+    table->elements[index] = new_node;
+    table->count++;
+    
     return true;
 }
 
-void *
-hash_table_lookup (hash_table_t * table_to_lookup, const char * key)
+bool 
+hash_table_lookup(hash_table_t* table, const char* key, void** value) 
 {
-    if (NULL == key || NULL == table_to_lookup)
+    if (NULL == table || NULL == key || NULL == value) 
     {
-        return NULL;
+        return false;
     }
 
-    size_t      index = hash_table_index (table_to_lookup, key);
-    ht_node_t * tmp   = table_to_lookup->elements[index];
+    size_t index = table->hash(key) % table->size;
+    ht_node_t* node = table->elements[index];
 
-    while (tmp != NULL && strcmp (tmp->key, key) != 0)
+    while (node != NULL) 
     {
-        tmp = tmp->next;
-    }
-    if (NULL == tmp)
-    {
-        return NULL;
-    }
-    return tmp->object;
-}
-
-void *
-hash_table_delete (hash_table_t * hash_table, const char * key)
-{
-    if (NULL == key || NULL == hash_table)
-    {
-        return NULL;
-    }
-
-    size_t      index = hash_table_index (hash_table, key);
-    ht_node_t * tmp   = hash_table->elements[index];
-    ht_node_t * prev  = NULL;
-
-    while (tmp != NULL && strcmp (tmp->key, key) != 0)
-    {
-        prev = tmp;
-        tmp  = tmp->next;
-    }
-
-    if (NULL == tmp)
-    {
-        return NULL;
-    }
-
-    if (NULL == prev)
-    {
-        hash_table->elements[index] = tmp->next;
-    }
-    else
-    {
-        prev->next = tmp->next;
-    }
-
-    void * result = tmp->object;
-    free (tmp->key);
-    tmp->key = NULL;
-
-    free (tmp);
-    tmp = NULL;
-
-    return result;
-}
-
-void
-print_hash_table (hash_table_t * table_to_print)
-{
-    printf ("Start Table\n");
-    for (uint32_t idx = 0; idx < table_to_print->size; idx++)
-    {
-        if (NULL == table_to_print->elements[idx])
+        if (strcmp(node->key, key) == 0) 
         {
-            printf ("\t%i\t---\n", idx);
+            *value = node->object;
+            return true;
         }
-        else
-        {
-            printf ("\t%i\t\n", idx);
-            ht_node_t * tmp = table_to_print->elements[idx];
-            while (NULL != tmp)
-            {
-                printf ("\"%s\"(%p) - ", tmp->key, tmp->object);
-                tmp = tmp->next;
+        node = node->next;
+    }
+
+    return false;
+}
+
+bool 
+hash_table_remove(hash_table_t* table, const char* key) 
+{
+    if (table == NULL || key == NULL) {
+        return false;
+    }
+    
+    void* value;
+    if (!hash_table_lookup(table, key, &value)) {
+        // Key doesn't exist, nothing to remove
+        return false;
+    }
+    
+    size_t index = table->hash(key) % table->size;
+    ht_node_t* node = table->elements[index];
+    ht_node_t* prev = NULL;
+    
+    while (node != NULL) {
+        if (strcmp(node->key, key) == 0) {
+            if (prev == NULL) {
+                table->elements[index] = node->next;
+            } else {
+                prev->next = node->next;
             }
-            printf ("\n");
+            free(node->key);
+            free(node);
+            table->count--;
+            return true;
         }
+        prev = node;
+        node = node->next;
     }
-    printf ("End Table\n");
+    
+    // This should never happen if lookup succeeded
+    return false;
 }
 
-bool
-hash_table_update (hash_table_t * hash_table,
-                   const char *   key,
-                   void *         new_object)
+void 
+print_hash_table(hash_table_t* table) 
 {
-    if (NULL == key || NULL == new_object || NULL == hash_table)
+    if (table == NULL) 
+    {
+        printf("Hash table is NULL\n");
+        return;
+    }
+
+    printf("Hash Table Contents:\n");
+    printf("Size: %zu, Count: %zu, Load Factor: %.2f\n", 
+           table->size, table->count, (double)table->count / table->size);
+
+    for (size_t i = 0; i < table->size; i++) {
+        printf("[%zu]", i);
+        ht_node_t* node = table->elements[i];
+        if (node == NULL) {
+            printf(" ---\n");
+        } else {
+            while (node != NULL) {
+                printf(" -> (%s: %p)", node->key, node->object);
+                node = node->next;
+            }
+            printf("\n");
+        }
+    }
+    printf("End of Hash Table\n");
+}
+
+bool 
+hash_table_update(hash_table_t* table, const char* key, void* new_value)
+{
+    if (table == NULL || key == NULL) {
+        return false;
+    }
+
+    void* current_value;
+    if (hash_table_lookup(table, key, &current_value)) {
+        // Key exists, update the value
+        size_t index = table->hash(key) % table->size;
+        ht_node_t* node = table->elements[index];
+        while (node != NULL) {
+            if (strcmp(node->key, key) == 0) {
+                node->object = new_value;
+                return true;
+            }
+            node = node->next;
+        }
+    }
+
+    // Key doesn't exist, insert a new node
+    return hash_table_insert(table, key, new_value);
+}
+
+bool 
+hash_table_resize(hash_table_t* table, size_t new_size)
+{
+    ht_node_t** new_elements = (ht_node_t**)calloc(new_size, sizeof(ht_node_t*));
+    if (NULL == new_elements) 
     {
         return false;
     }
-    size_t      index = hash_table_index (hash_table, key);
-    ht_node_t * tmp   = hash_table->elements[index];
-    while (tmp != NULL && strcmp (tmp->key, key) != 0)
+    
+    for (size_t idx = 0; idx < table->size; idx++) 
     {
-        tmp = tmp->next;
+        ht_node_t* node = table->elements[idx];
+        while (node != NULL) 
+        {
+            ht_node_t* next = node->next;
+            size_t new_index = table->hash(node->key) % new_size;
+            node->next = new_elements[new_index];
+            new_elements[new_index] = node;
+            node = next;
+        }
     }
-    if (tmp == NULL)
-    {
-        return false;
-    }
-    tmp->object = new_object;
+    
+    free(table->elements);
+    table->elements = new_elements;
+    table->size = new_size;
+    
     return true;
 }
 
-bool
-hash_table_resize (hash_table_t * hash_table, uint32_t new_size)
+void 
+hash_table_clear(hash_table_t* table)
 {
-    hash_table_t * new_table = create_hash_table (new_size, hash_table->hash);
-    if (new_table == NULL)
+    if (NULL == table) 
     {
-        return false;
+        return;
     }
-    for (uint32_t idx = 0; idx < hash_table->size; idx++)
+    
+    for (size_t idx = 0; idx < table->size; idx++) 
     {
-        ht_node_t * tmp = hash_table->elements[idx];
-        while (tmp != NULL)
-        {
-            hash_table_insert (new_table, tmp->key, tmp->object);
-            tmp = tmp->next;
+        ht_node_t* node = table->elements[idx];
+        while (node != NULL) {
+            ht_node_t* next = node->next;
+            free(node->key);
+            free(node);
+            node = next;
         }
+        table->elements[idx] = NULL;
     }
-    destroy_hash_table (hash_table);
-    *hash_table = *new_table;
-    free (new_table);
-    return true;
-}
-
-void
-hash_table_clear (hash_table_t * hash_table)
-{
-    for (uint32_t idx = 0; idx < hash_table->size; idx++)
-    {
-        ht_node_t * tmp = hash_table->elements[idx];
-        while (tmp != NULL)
-        {
-            ht_node_t * next = tmp->next;
-            free (tmp->key);
-            free (tmp);
-            tmp = next;
-        }
-        hash_table->elements[idx] = NULL;
-    }
+    
+    table->count = 0;
 }
 
 float
@@ -279,23 +315,79 @@ hash_table_get_load_factor (hash_table_t * hash_table)
     return (float) count / hash_table->size;
 }
 
-char **
-hash_table_get_keys (hash_table_t * hash_table, int * key_count)
+char** 
+hash_table_get_keys(hash_table_t* hash_table, size_t* key_count) 
 {
-    if (hash_table == NULL || key_count == NULL)
-        return NULL;
-    *key_count   = 0;
-    char ** keys = NULL;
-    for (uint32_t i = 0; i < hash_table->size; i++)
+    if (NULL == hash_table || NULL == key_count) 
     {
-        ht_node_t * tmp = hash_table->elements[i];
-        while (tmp != NULL)
+        return NULL;
+    }
+
+    *key_count = 0;
+    char** keys = NULL;
+
+    for (size_t idx = 0; idx < hash_table->size; idx++) 
+    {
+        ht_node_t* tmp = hash_table->elements[idx];
+
+        while (tmp != NULL) 
         {
-            keys = realloc (keys, (*key_count + 1) * sizeof (char *));
-            keys[*key_count] = strdup (tmp->key);
+            char** new_keys = realloc(keys, (*key_count + 1) * sizeof(char*));
+         
+            if (NULL == new_keys) 
+            {
+               
+                for (size_t jdx = 0; jdx < *key_count; jdx++) 
+                {
+                    free(keys[jdx]);
+                }
+                free(keys);
+                return NULL;
+            }
+
+            keys = new_keys;
+            keys[*key_count] = strdup(tmp->key);
+
+            if (NULL == keys[*key_count]) 
+            {
+                for (size_t kdx = 0; kdx < *key_count; kdx++) 
+                {
+                    free(keys[kdx]);
+                }
+                free(keys);
+                return NULL;
+            }
             (*key_count)++;
             tmp = tmp->next;
         }
     }
+
     return keys;
+}
+
+void 
+hash_table_free_keys(char** keys, size_t key_count) 
+{
+    if (NULL == keys) 
+    {
+        return;
+    }
+
+    for (size_t idx = 0; idx < key_count; idx++) 
+    {
+        free(keys[idx]);
+    }
+    free(keys);
+}
+
+size_t 
+hash_table_get_count(hash_table_t* table) 
+{
+    return table ? table->count : 0;
+}
+
+double 
+hash_table_get_load_factor(hash_table_t* table) 
+{
+    return table ? (double)table->count / table->size : 0.0;
 }

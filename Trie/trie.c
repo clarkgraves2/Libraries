@@ -6,7 +6,8 @@
 #define NUM_CHARS 256
 #define ALPHA_CHARS 26
 
-typedef struct trie_node{
+typedef struct trie_node
+{
     bool terminal;
     struct trie_node * children[NUM_CHARS];
 }trie_node_t;
