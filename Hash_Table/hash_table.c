@@ -17,15 +17,23 @@ typedef struct hash_table
     size_t            size;
     size_t            count;
     double            load_factor;
-    hash_function *   hash;
+    double            shrink_factor;
+    double            grow_factor;
+    double            shrink_threshold;
+    size_t            (*hash)(const char* key, size_t key_length);
     ht_node_t **      elements;
 } hash_table_t;
 
 #define DEFAULT_INITIAL_SIZE 16
 #define DEFAULT_LOAD_FACTOR 0.75
+#define DEFAULT_SHRINK_FACTOR 0.25
+#define DEFAULT_GROW_FACTOR 2.0
+#define DEFAULT_SHRINK_THRESHOLD 0.5
 
 hash_table_t * 
-hash_table_create(size_t initial_size, double load_factor, hash_function* hash_func) 
+hash_table_create(size_t initial_size, double load_factor, double shrink_factor, 
+                  double grow_factor, double shrink_threshold, 
+                  size_t (*hash_func)(const char* key, size_t key_length))
 {
     if (0 == initial_size)
     {
@@ -35,6 +43,21 @@ hash_table_create(size_t initial_size, double load_factor, hash_function* hash_f
     if (load_factor <= 0 || load_factor >= 1) 
     {
         load_factor = DEFAULT_LOAD_FACTOR;
+    }
+
+    if (shrink_factor <= 0 || shrink_factor >= load_factor)
+    {
+        shrink_factor = DEFAULT_SHRINK_FACTOR;
+    }
+
+    if (grow_factor <= 1)
+    {
+        grow_factor = DEFAULT_GROW_FACTOR;
+    }
+
+    if (shrink_threshold <= 0 || shrink_threshold >= 1)
+    {
+        shrink_threshold = DEFAULT_SHRINK_THRESHOLD;
     }
 
     if (NULL == hash_func)
@@ -60,6 +83,9 @@ hash_table_create(size_t initial_size, double load_factor, hash_function* hash_f
     table->size = initial_size;
     table->count = 0;
     table->load_factor = load_factor;
+    table->shrink_factor = shrink_factor;
+    table->grow_factor = grow_factor;
+    table->shrink_threshold = shrink_threshold;
     table->hash = hash_func;
 
     return table;
@@ -101,20 +127,16 @@ hash_table_insert(hash_table_t* table, const char* key, void* value)
     void* existing_value;
     if (hash_table_lookup(table, key, &existing_value)) 
     {
-    
         return hash_table_update(table, key, value);
     }
     
-    // Key doesn't exist, proceed with insertion
-    if ((double)(table->count + 1) / table->size > table->load_factor) 
+    if (!hash_table_check_resize(table)) 
     {
-        if (!hash_table_resize(table, table->size * 2)) 
-        {
-            return false;
-        }
+        return false;
     }
     
-    size_t index = table->hash(key) % table->size;
+    size_t key_length = strlen(key);
+    size_t index = table->hash(key, key_length) % table->size;
     ht_node_t* new_node = (ht_node_t*)malloc(sizeof(ht_node_t));
     if (new_node == NULL) 
     {
@@ -122,6 +144,11 @@ hash_table_insert(hash_table_t* table, const char* key, void* value)
     }
     
     new_node->key = strdup(key);
+    if (new_node->key == NULL)
+    {
+        free(new_node);
+        return false;
+    }
     new_node->object = value;
     new_node->next = table->elements[index];
     table->elements[index] = new_node;
@@ -131,14 +158,15 @@ hash_table_insert(hash_table_t* table, const char* key, void* value)
 }
 
 bool 
-hash_table_lookup(hash_table_t* table, const char* key, void** value) 
+hash_table_lookup(const hash_table_t* table, const char* key, void** value) 
 {
     if (NULL == table || NULL == key || NULL == value) 
     {
         return false;
     }
 
-    size_t index = table->hash(key) % table->size;
+    size_t key_length = strlen(key);
+    size_t index = table->hash(key, key_length) % table->size;
     ht_node_t* node = table->elements[index];
 
     while (node != NULL) 
@@ -157,42 +185,49 @@ hash_table_lookup(hash_table_t* table, const char* key, void** value)
 bool 
 hash_table_remove(hash_table_t* table, const char* key) 
 {
-    if (table == NULL || key == NULL) {
+    if (table == NULL || key == NULL) 
+    {
         return false;
     }
     
     void* value;
-    if (!hash_table_lookup(table, key, &value)) {
-        // Key doesn't exist, nothing to remove
+    if (!hash_table_lookup(table, key, &value)) 
+    {
         return false;
     }
     
-    size_t index = table->hash(key) % table->size;
+    size_t key_length = strlen(key);
+    size_t index = table->hash(key, key_length) % table->size;
     ht_node_t* node = table->elements[index];
     ht_node_t* prev = NULL;
     
     while (node != NULL) {
-        if (strcmp(node->key, key) == 0) {
-            if (prev == NULL) {
+        if (strcmp(node->key, key) == 0) 
+        {
+            if (prev == NULL) 
+            {
                 table->elements[index] = node->next;
-            } else {
+            } 
+            else 
+            {
                 prev->next = node->next;
             }
+
             free(node->key);
             free(node);
             table->count--;
+            hash_table_check_resize(table);
             return true;
         }
         prev = node;
         node = node->next;
     }
     
-    // This should never happen if lookup succeeded
     return false;
 }
 
 void 
-print_hash_table(hash_table_t* table) 
+print_hash_table(const hash_table_t* table) 
 {
     if (table == NULL) 
     {
@@ -229,8 +264,8 @@ hash_table_update(hash_table_t* table, const char* key, void* new_value)
 
     void* current_value;
     if (hash_table_lookup(table, key, &current_value)) {
-        // Key exists, update the value
-        size_t index = table->hash(key) % table->size;
+        size_t key_length = strlen(key);
+        size_t index = table->hash(key, key_length) % table->size;
         ht_node_t* node = table->elements[index];
         while (node != NULL) {
             if (strcmp(node->key, key) == 0) {
@@ -241,13 +276,17 @@ hash_table_update(hash_table_t* table, const char* key, void* new_value)
         }
     }
 
-    // Key doesn't exist, insert a new node
     return hash_table_insert(table, key, new_value);
 }
 
 bool 
 hash_table_resize(hash_table_t* table, size_t new_size)
-{
+{   
+    if (new_size < DEFAULT_INITIAL_SIZE || new_size < table->count) 
+    {
+        new_size = (DEFAULT_INITIAL_SIZE > table->count) ? DEFAULT_INITIAL_SIZE : table->count;
+    }
+
     ht_node_t** new_elements = (ht_node_t**)calloc(new_size, sizeof(ht_node_t*));
     if (NULL == new_elements) 
     {
@@ -260,7 +299,8 @@ hash_table_resize(hash_table_t* table, size_t new_size)
         while (node != NULL) 
         {
             ht_node_t* next = node->next;
-            size_t new_index = table->hash(node->key) % new_size;
+            size_t key_length = strlen(node->key);
+            size_t new_index = table->hash(node->key, key_length) % new_size;
             node->next = new_elements[new_index];
             new_elements[new_index] = node;
             node = next;
@@ -272,6 +312,24 @@ hash_table_resize(hash_table_t* table, size_t new_size)
     table->size = new_size;
     
     return true;
+}
+
+bool 
+hash_table_check_resize(hash_table_t* table)
+{
+    double current_load = (double)table->count / table->size;
+
+    if (current_load > table->load_factor) 
+    {
+        return hash_table_resize(table, table->size * table->grow_factor);
+    } 
+    
+    if (current_load < table->shrink_factor && table->size > DEFAULT_INITIAL_SIZE * table->shrink_threshold) 
+    {
+        return hash_table_resize(table, table->size / table->grow_factor);
+    }
+
+    return true; 
 }
 
 void 
@@ -297,26 +355,8 @@ hash_table_clear(hash_table_t* table)
     table->count = 0;
 }
 
-float
-hash_table_get_load_factor (hash_table_t * hash_table)
-{
-    if (hash_table == NULL)
-        return 0.0f;
-    int count = 0;
-    for (uint32_t i = 0; i < hash_table->size; i++)
-    {
-        ht_node_t * tmp = hash_table->elements[i];
-        while (tmp != NULL)
-        {
-            count++;
-            tmp = tmp->next;
-        }
-    }
-    return (float) count / hash_table->size;
-}
-
 char** 
-hash_table_get_keys(hash_table_t* hash_table, size_t* key_count) 
+hash_table_get_keys(const hash_table_t* hash_table, size_t* key_count) 
 {
     if (NULL == hash_table || NULL == key_count) 
     {
@@ -381,13 +421,22 @@ hash_table_free_keys(char** keys, size_t key_count)
 }
 
 size_t 
-hash_table_get_count(hash_table_t* table) 
+hash_table_get_count(const hash_table_t* table) 
 {
     return table ? table->count : 0;
 }
 
 double 
-hash_table_get_load_factor(hash_table_t* table) 
+hash_table_get_load_factor(const hash_table_t* table) 
 {
     return table ? (double)table->count / table->size : 0.0;
+}
+
+size_t djb2_hash(const char* key, size_t key_length)
+{
+    size_t hash = 5381;
+    for (size_t i = 0; i < key_length; i++) {
+        hash = ((hash << 5) + hash) + key[i];
+    }
+    return hash;
 }

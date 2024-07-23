@@ -1,207 +1,168 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fnmatch.h>
 #include "linked_list.h"
+#include <stdlib.h>
 
-struct node
-{
-    struct node *next;
-    void        *data;
+struct llist_node {
+    struct llist_node *next;
+    void *data;
 };
 
-struct llist
-{
-    node_t *head;
-    node_t *tail;
+struct llist {
+    llist_node_t *head;
+    llist_node_t *tail;
     ssize_t size;
 };
 
-llist_t * llist_create(void)
+llist_t *llist_create(void)
 {
-    llist_t * new_list = calloc(1,sizeof(llist_t));
-
-    if (NULL == new_list)
-    {
-        return NULL;
-    }
-
+    llist_t *new_list = calloc(1, sizeof(llist_t));
     return new_list;
 }
 
-ssize_t list_size(llist_t * llist)
+void llist_destroy(llist_t **list)
 {
-    if (NULL == llist)
-    {
-        return -1;
+    if (list == NULL || *list == NULL) {
+        return;
     }
 
-    return llist->size;
+    llist_node_t *current = (*list)->head;
+    while (current != NULL) {
+        llist_node_t *next = current->next;
+        free(current);
+        current = next;
+    }
+
+    free(*list);
+    *list = NULL;
 }
 
-node_t * llist_create_node(void * data)
+ssize_t llist_size(const llist_t *list)
 {
-    node_t * new_node = calloc(1,sizeof(node_t));
+    return (list != NULL) ? list->size : -1;
+}
 
-    if (NULL == new_node)
-    {
-        return NULL;
+llist_node_t *llist_create_node(void *data)
+{
+    llist_node_t *new_node = calloc(1, sizeof(llist_node_t));
+    if (new_node != NULL) {
+        new_node->data = data;
     }
-    new_node->data = data;
-    new_node->next = NULL;
     return new_node;
 }
 
-node_t * insert_front(llist_t * list, void * data)
+llist_node_t *llist_insert_front(llist_t *list, void *data)
 {
-    if (NULL == list || NULL == data)
-    {
+    if (list == NULL) {
         return NULL;
     }
 
-    node_t * node_to_insert = create_node(data);
-    
-    if (NULL == node_to_insert)
-    {
+    llist_node_t *node_to_insert = llist_create_node(data);
+    if (node_to_insert == NULL) {
         return NULL;
     }
 
-    if (NULL == list->head)
-    {
-        list->head = node_to_insert;
+    node_to_insert->next = list->head;
+    list->head = node_to_insert;
+
+    if (list->tail == NULL) {
         list->tail = node_to_insert;
-        (list->size)++;
-    }
-    else
-    {
-        node_to_insert->next = list->head;
-        list->head = node_to_insert;
-        (list->size)++;
     }
 
+    list->size++;
     return node_to_insert;
 }
 
-node_t * insert_back (llist_t * list, void * data)
+llist_node_t *llist_insert_back(llist_t *list, void *data)
 {
-    if (NULL == list || NULL == data)
-    {
+    if (list == NULL) {
         return NULL;
     }
 
-    node_t * node_to_insert = create_node(data);
-    
-    if (NULL == node_to_insert)
-    {
+    llist_node_t *node_to_insert = llist_create_node(data);
+    if (node_to_insert == NULL) {
         return NULL;
     }
 
-    if (NULL == list->head)
-    {
-        list->head = node_to_insert;
-        list->tail = node_to_insert;
-        (list->size)++;
-    }
-    else
-    {
+    if (list->tail == NULL) {
+        list->head = list->tail = node_to_insert;
+    } else {
         list->tail->next = node_to_insert;
         list->tail = node_to_insert;
-        (list->size)++;
     }
 
+    list->size++;
     return node_to_insert;
 }
 
-node_t * insert_at(llist_t * list, size_t position, void * data)
+llist_node_t *llist_insert_at(llist_t *list, size_t position, void *data)
 {
-    if (NULL == list || NULL == data || 0 > position)
-    {
+    if (list == NULL || position > (size_t)list->size) {
         return NULL;
     }
 
-    node_t * current_node = list->head;
-    node_t * node_to_insert = create_node(data);
-
-    if (0 == position || NULL == list->head || 0 == list_size(list))
-    {
-        return insert_front(list, data);
+    if (position == 0 || list->head == NULL) {
+        return llist_insert_front(list, data);
     }
 
-    ssize_t size_of_list = list_size(list);
-    
-    if (position == size_of_list)
-    {
-        return insert_back(list, data);
+    if (position == (size_t)list->size) {
+        return llist_insert_back(list, data);
     }
 
-    for (size_t i = 0; i < position - 1; ++i) 
-    {
-        current_node = current_node->next;
+    llist_node_t *node_to_insert = llist_create_node(data);
+    if (node_to_insert == NULL) {
+        return NULL;
     }
-    node_to_insert->next = current_node->next;
-    current_node->next = node_to_insert;
-    (list->size)++;
+
+    llist_node_t *current = list->head;
+    for (size_t i = 0; i < position - 1; ++i) {
+        current = current->next;
+    }
+
+    node_to_insert->next = current->next;
+    current->next = node_to_insert;
+    list->size++;
+
     return node_to_insert;
 }
 
-int delete_node(llist_t * list, void * data)
+int llist_delete_node(llist_t *list, const void *data)
 {
-    if (NULL == list || NULL == data)
-    {
+    if (list == NULL || list->head == NULL) {
         return -1;
     }
 
-    node_t * current_node = list->head;
-    node_t * previous_node = NULL;
+    llist_node_t *current = list->head;
+    llist_node_t *prev = NULL;
 
-    while (current_node != NULL)
-    {
-        if (current_node->data == data)
-        {
-            if (current_node == list->head)
-            {
-                list->head = current_node->next;
-                if (current_node == list->tail) 
-                {
-                    list->tail = NULL;
-                }
-                free(current_node);
-                (list->size)--;
-                return 0;
+    while (current != NULL) {
+        if (current->data == data) {
+            if (prev == NULL) {
+                list->head = current->next;
+            } else {
+                prev->next = current->next;
             }
 
-            if (current_node->next == NULL)
-            {
-                list->tail = previous_node;
+            if (current == list->tail) {
+                list->tail = prev;
             }
 
-            previous_node->next = current_node->next;
-            free(current_node);
-            (list->size)--;
+            free(current);
+            list->size--;
             return 0;
         }
 
-        previous_node = current_node;
-        current_node = current_node->next;
+        prev = current;
+        current = current->next;
     }
 
     return -1; // Node not found
 }
 
-void * get_node_data(node_t *node)
+void *llist_get_node_data(const llist_node_t *node)
 {
-    if (node == NULL)
-    {
-        return NULL;
-    }
-    return node->data;
+    return (node != NULL) ? node->data : NULL;
 }
 
-node_t * get_next_ptr(node_t *node)
+llist_node_t *llist_get_next_ptr(const llist_node_t *node)
 {
-    if (node == NULL)
-    {
-        return NULL;
-    }
-    return node->next;
+    return (node != NULL) ? node->next : NULL;
 }
