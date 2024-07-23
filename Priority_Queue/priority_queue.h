@@ -5,18 +5,28 @@
 
 typedef struct pqueue pqueue_t;
 
-pqueue_t * pqueue_create(void);
+pqueue_t *
+pqueue_create (int (*compare) (int, int));
 
-void pqueue_destroy(pqueue_t **pp_pqueue);
+void
+pqueue_destroy (pqueue_t ** pp_pqueue);
 
-bool pqueue_insert(pqueue_t * p_pqueue, int weight, void * data);
+bool
+pqueue_insert (pqueue_t * p_pqueue, int priority, void * data);
 
-void *pqueue_extract(pqueue_t *p_pqueue, int *p_weight);
+void *
+pqueue_extract (pqueue_t * pqueue);
 
-void *pqueue_peek(pqueue_t *p_pqueue);
+void *
+pqueue_peek (const pqueue_t * p_pqueue);
 
-bool pqueue_is_empty(pqueue_t *p_pqueue);
+bool
+pqueue_is_empty (const pqueue_t * p_pqueue);
 
-int pqueue_size(pqueue_t * p_pqueue);
+size_t
+pqueue_size (const pqueue_t * p_pqueue);
+
+static int
+default_compare (int a, int b);
 
 #endif
