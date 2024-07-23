@@ -6,13 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
 START_TEST (test_create_hash_table)
 {
-    int size = 20;
+    int             size          = 20;
     hash_function * test_function = 0;
-    hash_table_t * hash_table = create_hash_table(size, test_function);
+    hash_table_t *  hash_table    = create_hash_table (size, test_function);
     ck_assert_ptr_nonnull (hash_table);
     // Add ->Size Check and ->Elements Check
 }
@@ -29,7 +27,7 @@ hash_table_suite (void)
     tc_core = tcase_create ("create_hash_table()");
 
     tcase_add_test (tc_core, test_create_hash_table);
-  
+
     suite_add_tcase (s, tc_core);
 
     return s;
@@ -42,7 +40,7 @@ main (void)
     Suite *   s;
     SRunner * sr;
 
-    s  =  hash_table_suite();
+    s  = hash_table_suite();
     sr = srunner_create (s);
 
     srunner_run_all (sr, CK_NORMAL);
