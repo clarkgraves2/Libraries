@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include "../Priority_Queue/priority_queue.h"
 #include "maze.h"
+
 
 bool is_valid_char(char c) {
     return (c == WALL || c == SPACE || c == START || c == END);
@@ -182,5 +184,14 @@ maze_t * find_maze_path(maze_t * maze)
         {
             break;
         }
+    }
+    pqueue_t * priority_queue = pqueue_create(default_compare);
+    p
+    vertex_t * current_vertex = start;
+
+    while(current_vertex->symbol != END)
+    {
+
+
     }
 }

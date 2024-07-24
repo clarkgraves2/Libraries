@@ -16,6 +16,7 @@ typedef struct {
     float g_cost;
     float h_cost;
     float f_cost;
+    bool visited;
 } vertex_t;
 
 typedef struct {
