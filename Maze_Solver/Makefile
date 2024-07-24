@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -Wwrite-strings -Wvla -Winline -Wfloat-equal -Wstack-usage=1024 -std=c99
 VFLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes
 FEATURES := -D_POSIX_C_SOURCE=200809L
-STANDARD := -std=c99
+STANDARD := -std=c99 -D _DEFAULT_SOURCE
 
 # Define the Check library flags
 CHECK_CFLAGS = $(shell pkg-config --cflags check)
@@ -11,20 +11,20 @@ CLANG_FORMAT = clang-format
 CLANG_FORMAT_FLAGS = -i --style=file
 
 # Define the source files
-SRC = linked_list.c
+SRC = maze.c maze_funcs.c
 OBJ = $(SRC:.c=.o)
-DEPS = linked_list.h
+DEPS = maze.h
 
 # Define the executable name
-TARGET = linked_list_test
+TARGET = maze
 
 # Rule to build the target
 $(TARGET): $(OBJ)
-	$(CC) -o $@ $^ $(CHECK_LDFLAGS)
+	$(CC) -o $@ $^ $(CHECK_LDFLAGS) $(STANDARD) $(FEATURES)
 
 # Rule to build object files
 %.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) $(CHECK_CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CHECK_CFLAGS) $(STANDARD) $(FEATURES) -c -o $@ $<
 
 # Rule to clean up the build
 .PHONY: clean
@@ -40,7 +40,7 @@ debug: $(TARGET)
 	gdb ./$(TARGET)
 
 tidy:
-	clang-tidy linked_list.c -- $(CFLAGS) $(CHECK_CFLAGS) $(STANDARD) $(FEATURES)
+	clang-tidy maze.c maze_funcs -- $(CFLAGS) $(CHECK_CFLAGS) $(STANDARD) $(FEATURES)
 
 
 format:

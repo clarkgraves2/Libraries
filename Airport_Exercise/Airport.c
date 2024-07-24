@@ -11,14 +11,11 @@
 #define ACK_LEN (3)
 #define DST_IDX (7)
 
-
-
 typedef struct airport
 {
-    const char * name;
-    struct airport_t * connection;
-}airport_t;
-
+    char * name;
+    llist_node_t * connection;
+} airport_t;
 
 uint64_t simple_hash(const char *str, size_t size);
 airport_t * airport_create (const char *p_name);
@@ -46,18 +43,18 @@ int main(void)
     if (0 != b_is_regex)
     {
         fprintf(stderr, "[ERR]: Could not compile regex\n");
-        return 0;
+        fclose(fptr);
+        hash_table_destroy(airport_htable);
+        return 1;
     }
 
     char buffer[LINE_SIZE];
-    ssize_t len    = 0;
-
     while (fgets(buffer, sizeof(buffer), fptr)) 
     {
-
-        if ('\n' == buffer[len - 1])
+        size_t len = strlen(buffer);
+        if (len > 0 && '\n' == buffer[len - 1])
         {
-            buffer[--len] = '\0';
+            buffer[len - 1] = '\0';
         }
         
         b_is_regex = regexec(&regex, buffer, 0, NULL, 0);
@@ -67,37 +64,41 @@ int main(void)
             continue;
         }
         
-        buffer[ACK_LEN] = '\0';
-        airport_t *p_src  = hash_table_lookup(airport_htable, buffer);
-        
+        char src_code[ACK_LEN + 1];
+        char dst_code[ACK_LEN + 1];
+        strncpy(src_code, buffer, ACK_LEN);
+        src_code[ACK_LEN] = '\0';
+        strncpy(dst_code, buffer + DST_IDX, ACK_LEN);
+        dst_code[ACK_LEN] = '\0';
+
+        airport_t *p_src = hash_table_lookup(airport_htable, src_code);
         if (NULL == p_src)
         {
-            p_src = airport_create(buffer);
+            p_src = airport_create(src_code);
             if (NULL == p_src)
             {
-                fprintf(stderr, "[ERR]: Creating Airport: %s\n", buffer);
+                fprintf(stderr, "[ERR]: Creating Airport: %s\n", src_code);
                 continue;
             }
-            hash_table_insert(airport_htable, buffer, p_src);
+            hash_table_insert(airport_htable, src_code, p_src);
         }
 
-        airport_t *p_dst = hash_table_lookup(airport_htable, buffer + DST_IDX);
-        
+        airport_t *p_dst = hash_table_lookup(airport_htable, dst_code);
         if (NULL == p_dst)
         {
-            p_dst = airport_create(buffer + DST_IDX);
+            p_dst = airport_create(dst_code);
             if (NULL == p_dst)
             {
-                fprintf(stderr, "[ERR]: Creating Airport: %s\n", buffer);
+                fprintf(stderr, "[ERR]: Creating Airport: %s\n", dst_code);
                 continue;
             }
-            hash_table_insert(airport_htable, buffer + DST_IDX, p_dst);
+            hash_table_insert(airport_htable, dst_code, p_dst);
         }
 
-        insert_back(p_src->connection, p_dst);
-        insert_back(p_dst->connection, p_src);
+        llist_insert_back(p_src->connection, p_dst);
+        llist_insert_back(p_dst->connection, p_src);
     }
-    free(buffer);
+
     print_hash_table(airport_htable);
     destroy_hash_table(airport_htable);
     regfree(&regex);
@@ -105,22 +106,11 @@ int main(void)
     return 0;
 }
 
-uint64_t simple_hash(const char *str, size_t size) 
-{
-    if (str == NULL) return 0;
-
-    uint64_t hash = 5381;
-    int c;
-    while ((c = *str++))
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-    return hash;
-}
-
 airport_t *
 airport_create (const char *p_name)
 {
     airport_t *p_airport = NULL;
-    node_t   *p_llist   = NULL;
+    llist_node_t   *p_llist   = NULL;
 
     if (NULL != p_name)
     {

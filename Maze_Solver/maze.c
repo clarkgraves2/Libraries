@@ -6,32 +6,20 @@
 #include <string.h>
 #include <stdint.h>
 
-typedef struct vertex
-{
-    char symbol;
-    int col;
-    int row;
-    struct vertex* parent;
-    float g_cost;  // Cost from start to this node
-    float h_cost;  // Heuristic cost from this node to goal
-    float f_cost;  // Total cost (g_cost + h_cost)
-} vertex_t;
-
 #define GETOPTERROR (0)
 #define GETOPT (1)
 #define MINROWELEMENTS (1)
-
-
 
 int
 main (int argc, char * argv[])
 {
     int cdx;
+    int option = 1;
     bool v_opt_selected = false;
 
     // Get opt module to handle command line arguments.
     //
-    while (GETOPT)
+    while (option)
     {
         // get-opt long option handling and customization
         //
@@ -44,7 +32,7 @@ main (int argc, char * argv[])
 
         // get-opt variable / option handling customization
         //
-        cdx = getopt_long (argc, argv, "-:v", long_options, &option_index);
+        cdx = getopt_long(argc, argv, "-:v:", long_options, &option_index);
 
         // If no option or filename provided program exits.
         //
@@ -55,7 +43,7 @@ main (int argc, char * argv[])
         
         switch (cdx)
         {
-            case GETOPT: // case to handle filename "long" option
+            case 1: // case to handle filename "long" option
                 break;
             case 'v': // case to handle -v option of printing all hole sizes
                 v_opt_selected = true;
@@ -63,9 +51,11 @@ main (int argc, char * argv[])
             case '?': // Unknown option handling.
                 printf ("Unknown option %c\n", optopt);
                 break;
-            default: // Required Default option if above cases fail.
-                printf ("Wrong Combination of File and/or option");
-                break;
+            default:
+                option = 0;
+                break; // Required Default option if above cases fail.
+               
+
         }
     }
 
@@ -84,32 +74,22 @@ main (int argc, char * argv[])
         fprintf(stderr,"Error: Too Many Arguments - Exiting\n");
         exit(EXIT_FAILURE);
     }
-
-    // Assigning userprovided file name in command line to variable.
-    //
+    
     const char * filename = argv[1];
 
-    // Error checking for filename assignment error.
-    if (NULL == filename)
+    maze_t * maze = read_file_and_create_matrix(filename); 
+   
+    if (maze != NULL) 
     {
-        fprintf(stderr,"Error: Failed to assign filename\n");
-        exit(EXIT_FAILURE);
-    }
-
-    FILE * file_pointer;
-
-    // Opening file to process and retrieve data.
-    //
-    file_pointer = fopen (filename, "r");
-
-    // Error Checking for file not opening correctly.
-    //
-    if (NULL == file_pointer)
+        print_maze(maze);
+        // Use the maze for pathfinding or other operations
+        free_maze(maze);
+    } 
+    else 
     {
-        fprintf(stderr,"Error opening file - Exiting\n");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Failed to create maze.\n");
     }
-
-    int valid_char_count = 0;
+    
+    return 0;
 }
 
