@@ -11,9 +11,9 @@ CLANG_FORMAT = clang-format
 CLANG_FORMAT_FLAGS = -i --style=file
 
 # Define the source files
-SRC = maze.c maze_funcs.c
+SRC = maze.c driver.c ../Priority_Queue/priority_queue.c
 OBJ = $(SRC:.c=.o)
-DEPS = maze.h
+DEPS = maze.h ../Priority_Queue/priority_queue.h
 
 # Define the executable name
 TARGET = maze

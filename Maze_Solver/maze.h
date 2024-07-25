@@ -29,5 +29,9 @@ bool is_valid_char(char c);
 maze_t * read_file_and_create_matrix(const char* filename);
 void print_maze(const maze_t* maze);
 void free_maze(maze_t* maze);
+int compare_vertices(const void* a, const void* b);
+float calculate_heuristic(vertex_t* a, vertex_t* b);
+maze_t* reconstruct_path(maze_t* maze, vertex_t* end);
+ 
 
 #endif // MAZE_H

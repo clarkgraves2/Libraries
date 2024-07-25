@@ -16,8 +16,8 @@ struct pqueue
 };
 
 // Create a new priority queue
-pqueue_t *
-pqueue_create (int (*compare) (int, int))
+pqueue_t * 
+pqueue_create(int (*compare)(const void*, const void*))
 {
     pqueue_t * queue = calloc (1, sizeof (pqueue_t));
     if (NULL == queue)
@@ -48,20 +48,16 @@ default_compare (int a, int b)
     return a - b;
 }
 
-// Destroy the priority queue and free all associated memory
-void
-pqueue_destroy (pqueue_t ** pp_pqueue)
+
+pqueue_destroy (pqueue_t * pqueue)
 {
-    if (NULL == pp_pqueue || NULL == *pp_pqueue)
+    if (NULL == pqueue)
     {
         return;
     }
-
-    pqueue_t * pqueue = *pp_pqueue;
     free (pqueue->priorities);
     free (pqueue->items);
     free (pqueue);
-    *pp_pqueue = NULL;
 }
 
 // Insert an item into the priority queue
@@ -228,4 +224,47 @@ pqueue_resize (pqueue_t * pqueue)
     pqueue->capacity   = new_capacity;
 
     return true;
+}
+
+bool 
+pqueue_contains(const pqueue_t* pqueue, const void* item) {
+    if (NULL == pqueue || NULL == item) {
+        return false;
+    }
+
+    for (size_t i = 0; i < pqueue->size; i++) {
+        if (pqueue->items[i] == item) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool 
+pqueue_change_priority(pqueue_t* pqueue, void* item, int new_priority) 
+{
+    if (NULL == pqueue || NULL == item) 
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < pqueue->size; i++) 
+    {
+        if (pqueue->items[i] == item) 
+        {
+            int old_priority = pqueue->priorities[i];
+            pqueue->priorities[i] = new_priority;
+
+            if (pqueue->compare(new_priority, old_priority) < 0) 
+            {
+                pqueue_heapify_up(pqueue, i);
+            }
+            else 
+            {
+                pqueue_heapify_down(pqueue, i);
+            }
+            return true;
+        }
+    }
+    return false; 
 }
