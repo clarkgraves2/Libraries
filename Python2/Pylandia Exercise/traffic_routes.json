@@ -1,0 +1,272 @@
+{
+    "0500" : { 
+        "Snake Loop" : {
+            "Coder Crescent": 3,
+            "Module Mews" : 6,
+            "Byte Boulevard" : 6},
+        "Byte Boulevard" : {
+            "Algorithm Avenue" : 1,
+            "Snake Loop" : 6,
+            "Object-Oriented Overpass" : 5 },
+        "Coder Crescent" : {
+            "Snake Loop" : 3,
+            "Tuple Terrace" : 3,
+            "Algorithm Avenue" : 3},
+        "Algorithm Avenue" : {
+            "Byte Boulevard" : 1,
+            "Coder Crescent" : 3,
+            "Lambda Lane" : 3},
+        "Lambda Lane" : {
+            "Algorithm Avenue" : 3,
+            "Object-Oriented Overpass" : 4,
+            "Tuple Terrace" : 3},
+        "Tuple Terrace" : {
+            "Lambda Lane" : 3,
+            "Coder Crescent" : 3,
+            "Decorator Drive" : 1},
+        "Decorator Drive" : {
+            "Tuple Terrace" : 1,
+            "Module Mews" : 2,
+            "Parameter Parkway" : 7,
+            "Function Freeway" : 4 },
+        "Module Mews" : {
+            "Snake Loop" : 6,
+            "Script Street" : 1,
+            "Decorator Drive" : 2},
+        "Script Street" : {
+            "Module Mews" : 1},
+        "Function Freeway" : {
+            "Decorator Drive" : 4,
+            "Compile Court" : 12},
+        "Parameter Parkway" : {
+            "Decorator Drive" : 7,
+            "Syntax Square" : 2,
+            "Object-Oriented Overpass" : 2},
+        "Syntax Square" : {
+            "Parameter Parkway" : 2},
+        "Compile Court" : {
+            "Object-Oriented Overpass" : 5,
+            "Debug Drive" : 2,
+            "Function Freeway" : 12},
+        "Debug Drive" : {
+            "Compile Court" : 2},
+        "Object-Oriented Overpass" : {
+            "Compile Court" : 5,
+            "Parameter Parkway": 2,
+            "Lambda Lane" : 4,
+            "Byte Boulevard" : 5}
+    },
+    "0800" : { 
+        "Snake Loop" : {
+            "Coder Crescent": 4,
+            "Module Mews" : 8,
+            "Byte Boulevard" : 7},
+        "Byte Boulevard" : {
+            "Algorithm Avenue" : 2,
+            "Snake Loop" : 7,
+            "Object-Oriented Overpass" : 6 },
+        "Coder Crescent" : {
+            "Tuple Terrace" : 4,
+            "Algorithm Avenue" : 4},
+        "Algorithm Avenue" : {
+            "Byte Boulevard" : 2,
+            "Coder Crescent" : 4,
+            "Lambda Lane" : 4},
+        "Lambda Lane" : {
+            "Algorithm Avenue" : 4,
+            "Object-Oriented Overpass" : 5,
+            "Tuple Terrace" : 4},
+        "Tuple Terrace" : {
+            "Lambda Lane" : 4,
+            "Coder Crescent" : 4,
+            "Decorator Drive" : 2},
+        "Decorator Drive" : {
+            "Tuple Terrace" : 2,
+            "Module Mews" : 4,
+            "Parameter Parkway" : 10,
+            "Function Freeway" : 5 },
+        "Module Mews" : {
+            "Snake Loop" : 8,
+            "Script Street" : 3,
+            "Decorator Drive" : 4},
+        "Script Street" : {
+            "Module Mews" : 3},
+        "Function Freeway" : {
+            "Decorator Drive" : 5,
+            "Compile Court" : 15},
+        "Parameter Parkway" : {
+            "Decorator Drive" : 10,
+            "Syntax Square" : 4,
+            "Object-Oriented Overpass" : 4},
+        "Syntax Square" : {
+            "Parameter Parkway" : 4},
+        "Compile Court" : {
+            "Debug Drive" : 3,
+            "Function Freeway" : 15},
+        "Debug Drive" : {
+            "Compile Court" : 3},
+        "Object-Oriented Overpass" : {
+            "Compile Court" : 6,
+            "Parameter Parkway": 4,
+            "Byte Boulevard" : 6}
+    },
+    "1200" : { 
+        "Snake Loop" : {
+            "Coder Crescent": 4,
+            "Module Mews" : 6,
+            "Byte Boulevard" : 7},
+        "Byte Boulevard" : {
+            "Algorithm Avenue" : 3,
+            "Snake Loop" : 7,
+            "Object-Oriented Overpass" : 6 },
+        "Coder Crescent" : {
+            "Snake Loop" : 4,
+            "Tuple Terrace" : 4,
+            "Algorithm Avenue" : 4},
+        "Algorithm Avenue" : {
+            "Byte Boulevard" : 3,
+            "Coder Crescent" : 4,
+            "Lambda Lane" : 4},
+        "Lambda Lane" : {
+            "Algorithm Avenue" : 4,
+            "Object-Oriented Overpass" : 6,
+            "Tuple Terrace" : 4},
+        "Tuple Terrace" : {
+            "Lambda Lane" : 4,
+            "Coder Crescent" : 4,
+            "Decorator Drive" : 3},
+        "Decorator Drive" : {
+            "Tuple Terrace" : 3,
+            "Module Mews" : 5,
+            "Parameter Parkway" : 8,
+            "Function Freeway" : 6 },
+        "Module Mews" : {
+            "Snake Loop" : 6,
+            "Script Street" : 4,
+            "Decorator Drive" : 5},
+        "Script Street" : {
+            "Module Mews" : 4},
+        "Function Freeway" : {
+            "Decorator Drive" : 6,
+            "Compile Court" : 14},
+        "Parameter Parkway" : {
+            "Decorator Drive" : 8,
+            "Syntax Square" : 5,
+            "Object-Oriented Overpass" : 5},
+        "Syntax Square" : {
+            "Parameter Parkway" : 5},
+        "Compile Court" : {
+            "Object-Oriented Overpass" : 7,
+            "Debug Drive" : 4,
+            "Function Freeway" : 14},
+        "Debug Drive" : {
+            "Compile Court" : 4},
+        "Object-Oriented Overpass" : {
+            "Compile Court" : 7,
+            "Parameter Parkway": 5,
+            "Lambda Lane" : 6,
+            "Byte Boulevard" : 6}
+    },
+    "1700" : { 
+        "Snake Loop" : {
+            "Module Mews" : 7,
+            "Byte Boulevard" : 8},
+        "Byte Boulevard" : {
+            "Algorithm Avenue" : 4,
+            "Snake Loop" : 8,
+            "Object-Oriented Overpass" : 7 },
+        "Coder Crescent" : {
+            "Snake Loop" : 5,
+            "Tuple Terrace" : 5,
+            "Algorithm Avenue" : 5},
+        "Algorithm Avenue" : {
+            "Byte Boulevard" : 4,
+            "Coder Crescent" : 5,
+            "Lambda Lane" : 5},
+        "Lambda Lane" : {
+            "Algorithm Avenue" : 5,
+            "Tuple Terrace" : 5},
+        "Tuple Terrace" : {
+            "Lambda Lane" : 5,
+            "Coder Crescent" : 5,
+            "Decorator Drive" : 4},
+        "Decorator Drive" : {
+            "Tuple Terrace" : 4,
+            "Module Mews" : 6,
+            "Parameter Parkway" : 9,
+            "Function Freeway" : 7 },
+        "Module Mews" : {
+            "Snake Loop" : 7,
+            "Script Street" : 5,
+            "Decorator Drive" : 6},
+        "Script Street" : {
+            "Module Mews" : 5},
+        "Function Freeway" : {
+            "Decorator Drive" : 7,
+            "Compile Court" : 13},
+        "Parameter Parkway" : {
+            "Decorator Drive" : 9,
+            "Syntax Square" : 6,
+            "Object-Oriented Overpass" : 6},
+        "Syntax Square" : {
+            "Parameter Parkway" : 6},
+        "Compile Court" : {
+            "Object-Oriented Overpass" : 8,
+            "Debug Drive" : 5,
+            "Function Freeway" : 13},
+        "Debug Drive" : {
+            "Compile Court" : 5},
+        "Object-Oriented Overpass" : {
+            "Parameter Parkway": 6,
+            "Lambda Lane" : 7,
+            "Byte Boulevard" : 7}
+    },
+    "2400" : { 
+        "Snake Loop" : {
+            "Coder Crescent": 2,
+            "Module Mews" : 5,
+            "Byte Boulevard" : 5},
+        "Byte Boulevard" : {
+            "Algorithm Avenue" : 1,
+            "Snake Loop" : 5,
+            "Object-Oriented Overpass" : 4 },
+        "Coder Crescent" : {
+            "Snake Loop" : 2,
+            "Tuple Terrace" : 2,
+            "Algorithm Avenue" : 2},
+        "Algorithm Avenue" : {
+            "Byte Boulevard" : 1,
+            "Coder Crescent" : 2,
+            "Lambda Lane" : 2},
+        "Lambda Lane" : {
+            "Algorithm Avenue" : 2,
+            "Object-Oriented Overpass" : 3,
+            "Tuple Terrace" : 2},
+        "Tuple Terrace" : {
+            "Lambda Lane" : 2,
+            "Coder Crescent" : 2,
+            "Decorator Drive" : 1},
+        "Decorator Drive" : {
+            "Tuple Terrace" : 1,
+            "Module Mews" : 1,
+            "Parameter Parkway" : 3,
+            "Function Freeway" : 2 },
+        "Module Mews" : {
+            "Snake Loop" : 5,
+            "Decorator Drive" : 1},
+        "Function Freeway" : {
+            "Decorator Drive" : 2,
+            "Compile Court" : 6},
+        "Parameter Parkway" : {
+            "Decorator Drive" : 3,
+            "Object-Oriented Overpass" : 2},
+        "Compile Court" : {
+            "Object-Oriented Overpass" : 4,
+            "Function Freeway" : 6},
+        "Object-Oriented Overpass" : {
+            "Compile Court" : 4,
+            "Parameter Parkway": 2,
+            "Lambda Lane" : 3,
+            "Byte Boulevard" : 4}
+    }
+}
