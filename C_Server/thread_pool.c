@@ -1,3 +1,4 @@
+#include "thread_pool.h"
 
 // defines the parameters for the thread pool
 #define MAX_THREADS 4
@@ -13,8 +14,8 @@ typedef struct {
 // Thread pool struct 
 typedef struct {
     task_t queue[QUEUE_SIZE];
-    int front, 
-    int rear
+    int front;
+    int rear;
     int count;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
