@@ -1,38 +1,101 @@
 #ifndef HASH_TABLE_H
 #define HASH_TABLE_H
 
+#define _POSIX_C_SOURCE 200809L
+#define _GNU_SOURCE
+
+#include <pthread.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <errno.h>
 
-/**
- * @brief Opaque hash table type.
+
+#define HASH_TABLE_DEFAULT_SIZE       16u
+#define HASH_TABLE_DEFAULT_LOAD       0.75f
+#define HASH_TABLE_DEFAULT_SHRINK     0.25f
+#define HASH_TABLE_DEFAULT_GROW       2.0f
+#define HASH_TABLE_DEFAULT_SHRINK_RATE 0.5f
+
+/*!
+ * @brief Error codes specific to hash table operations
  */
-typedef struct hash_table hash_table_t;
-typedef struct ht_node ht_node_t;
+typedef enum hash_table_error
+{
+    HASH_TABLE_SUCCESS = 0,
+    HASH_TABLE_ERROR_NULL_ARG,
+    HASH_TABLE_ERROR_BAD_PARAMETER,
+    HASH_TABLE_ERROR_NO_MEMORY,
+    HASH_TABLE_ERROR_LOCK_FAIL,
+    HASH_TABLE_ERROR_UNKNOWN
+} hash_table_error_t;
 
-typedef uint64_t hash_function (const char *, size_t);
+/*!
+ * @brief Node structure for hash table entries
+ */
+typedef struct hash_node
+{
+    char *              p_key;
+    void *              p_object;
+    struct hash_node *  p_next;
+} hash_node_t;
 
-hash_table_t * create_hash_table(uint32_t size, hash_function * hash_func);
+/*!
+ * @brief Main hash table structure with thread safety support
+ */
+typedef struct hash_table
+{
+    size_t             size;
+    size_t             count;
+    float              load_max;      
+    float              shrink_min;    
+    float              grow_rate;     
+    float              shrink_rate;   
+    uint32_t           (*p_hash_fn)(const char *p_key, uint32_t key_len);
+    hash_node_t **     p_elements;    
+    pthread_rwlock_t   rw_lock;       
+} hash_table_t;
 
-void hash_table_destroy(hash_table_t* table); 
+/*!
+ * @brief Creates and initializes a new thread-safe hash table
+ *
+ * @param[out] pp_table Pointer to location to store created hash table
+ * @param[in] size Initial size of the hash table
+ * @param[in] load_limit Maximum entries before growth (0-1)
+ * @param[in] shrink_limit Minimum entries before shrink (0-1)
+ * @param[in] grow_rt Growth rate when resizing
+ * @param[in] shrink_rt Shrink rate when resizing
+ * @param[in] hash_fn Pointer to hash function
+ * @param[out] p_error_msg Buffer to store error message
+ * @param[in] error_msg_len Length of error message buffer
+ * 
+ * @return Error code indicating success or failure type
+ */
+hash_table_error_t 
+hash_table_create(hash_table_t **pp_table,
+                  uint32_t size, 
+                  float load_limit,
+                  float shrink_limit, 
+                  float grow_rt,
+                  float shrink_rt,
+                  uint32_t (*hash_fn)(const char *p_key, uint32_t len),
+                  char *p_error_msg,
+                  size_t error_msg_len);
 
-bool hash_table_insert(hash_table_t * hash_table, const char * key, void * object);
+/*!
+ * @brief Destroys a hash table and frees all associated memory
+ *
+ * @param[in,out] pp_table Pointer to hash table pointer to destroy
+ * @param[out] p_error_msg Buffer to store error message
+ * @param[in] error_msg_len Length of error message buffer
+ * 
+ * @return Error code indicating success or failure type
+ * 
+ * @note Sets the input pointer to NULL after destruction
+ */
+hash_table_error_t 
+hash_table_destroy(hash_table_t **pp_table,
+                   char *p_error_msg,
+                   size_t error_msg_len);
 
-bool hash_table_lookup(const hash_table_t* table, const char* key, void** value);
-
-bool hash_table_remove(hash_table_t* table, const char* key); 
-
-void print_hash_table(hash_table_t * table_to_print);
-
-bool hash_table_update(hash_table_t * hash_table, const char * key, void * new_object);
-
-bool hash_table_resize(hash_table_t* table, size_t new_size);
-
-void hash_table_clear(hash_table_t * hash_table);
-
-double hash_table_get_load_factor(const hash_table_t* table); 
-
-char** hash_table_get_keys(const hash_table_t* hash_table, size_t* key_count); 
-
-#endif
+#endif /* HASH_TABLE_H */
