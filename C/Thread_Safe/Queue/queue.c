@@ -261,7 +261,6 @@ queue_dequeue(queue_t *p_queue, void **pp_item)
 
     free(p_node);
 
-    /* Signal waiting threads */
     pthread_cond_signal(&p_queue->not_full);
     unlock_queue(p_queue);
 
@@ -276,7 +275,7 @@ queue_size(queue_t *p_queue)
 
     if (NULL == p_queue)
     {
-        return -1;
+        return QUEUE_ERR_NULL_PTR;
     }
 
     if (QUEUE_ACT_SUCCESS != (result = lock_queue(p_queue)))
