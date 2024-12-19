@@ -21,16 +21,19 @@ typedef struct {
     pthread_cond_t cond;
 } threadpool_t;
 
-void threadpool_init(threadpool_t *pool) {
+void threadpool_init(threadpool_t *pool) 
+{
     pool->front = pool->rear = pool->count = 0;
     pthread_mutex_init(&pool->mutex, NULL);
     pthread_cond_init(&pool->cond, NULL);
 }
 
-void threadpool_add_task(threadpool_t *pool, void (*function)(void *), void *arg) {
+void threadpool_add_task(threadpool_t *pool, void (*function)(void *), void *arg) 
+{
     pthread_mutex_lock(&pool->mutex);
 
-    if (pool->count == QUEUE_SIZE) {
+    if (pool->count == QUEUE_SIZE) 
+    {
         printf("Queue is full\n");
         pthread_mutex_unlock(&pool->mutex);
         return;
@@ -48,10 +51,12 @@ void threadpool_add_task(threadpool_t *pool, void (*function)(void *), void *arg
 void *threadpool_worker(void *arg) {
     threadpool_t *pool = (threadpool_t *)arg;
 
-    while (1) {
+    while (1) 
+    {
         pthread_mutex_lock(&pool->mutex);
 
-        while (pool->count == 0) {
+        while (pool->count == 0) 
+        {
             pthread_cond_wait(&pool->cond, &pool->mutex);
         }
 
