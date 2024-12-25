@@ -1,73 +1,64 @@
+
 #include "thread_pool.h"
+#include "queue.h"
+#include <pthread.h>
+#include <stdbool.h>
 
-// defines the parameters for the thread pool
-#define MAX_THREADS 4
-#define QUEUE_SIZE 10
 
-// Struct responsible for the function and it's args
-// to be executed by the thread.
-typedef struct {
-    void (*function)(void*);
-    void *arg;
-} task_t;
-
-// Thread pool struct 
-typedef struct {
-    task_t queue[QUEUE_SIZE];
-    int front;
-    int rear;
-    int count;
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-} threadpool_t;
-
-void threadpool_init(threadpool_t *pool) 
+struct thread_pool
 {
-    pool->front = pool->rear = pool->count = 0;
-    pthread_mutex_init(&pool->mutex, NULL);
-    pthread_cond_init(&pool->cond, NULL);
-}
+    int num_threads;
+    bool running;
+    queue_t * queue;
+    pthread_t * pool;
+    pthread_mutex_t thread_pool_lock;
+    pthread_cond_t signal;
+};
 
-void threadpool_add_task(threadpool_t *pool, void (*function)(void *), void *arg) 
+struct thread_job
 {
-    pthread_mutex_lock(&pool->mutex);
+    void * (*thread_job)(void * arg);
+    void * arg;
+};
 
-    if (pool->count == QUEUE_SIZE) 
+void * thread_pool_job(void * arg);
+
+thread_pool_t *
+thread_pool_initialize(int num_threads)
+{
+    if (0 >= num_threads)
     {
-        printf("Queue is full\n");
-        pthread_mutex_unlock(&pool->mutex);
-        return;
+        // Log Error
+        return NULL;
     }
 
-    task_t task = { function, arg };
-    pool->queue[pool->rear] = task;
-    pool->rear = (pool->rear + 1) % QUEUE_SIZE;
-    pool->count++;
+    thread_pool_t * thread_pool = calloc(1, sizeof(thread_pool_t));
+    if (NULL == thread_pool)
+    {
+        // Log Error
+        free(thread_pool);
+        thread_pool = NULL;
+        return NULL;
+    }
+    
+    thread_pool->num_threads = num_threads;
+    thread_pool->running = true;
+    thread_pool->pool = calloc(1, sizeof(pthread_t[num_threads]));
 
-    pthread_cond_signal(&pool->cond);
-    pthread_mutex_unlock(&pool->mutex);
+    for (int idx = 0; idx < num_threads; idx++)
+    {
+        pthread_create(&thread_pool->pool[idx], NULL, thread_pool_job, NULL);
+    }
+    
+    thread_pool->queue = queue_create();
+
+    int lock_result = pthread_mutex_init(&thread_pool->thread_pool_lock, NULL);
+    int cond_result = pthread_cond_init(&thread_pool->signal, NULL);
+
+    return thread_pool;
 }
 
-void *threadpool_worker(void *arg) {
-    threadpool_t *pool = (threadpool_t *)arg;
+void * thread_pool_job(void * arg)
+{
 
-    while (1) 
-    {
-        pthread_mutex_lock(&pool->mutex);
-
-        while (pool->count == 0) 
-        {
-            pthread_cond_wait(&pool->cond, &pool->mutex);
-        }
-
-        task_t task = pool->queue[pool->front];
-        pool->front = (pool->front + 1) % QUEUE_SIZE;
-        pool->count--;
-
-        pthread_mutex_unlock(&pool->mutex);
-
-        task.function(task.arg);
-    }
-
-    return NULL;
 }
