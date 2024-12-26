@@ -59,7 +59,8 @@ thread_pool_initialize(int num_threads)
     return thread_pool;
 }
 
-void * thread_pool_job(void * arg)
+void * 
+thread_pool_job(void * arg)
 {
     thread_pool_t * thread_pool = (thread_pool_t *)arg;
     while (THREAD_POOL_RUNNING == thread_pool->state)
