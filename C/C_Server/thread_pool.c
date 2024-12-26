@@ -4,11 +4,12 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+#define THREAD_POOL_RUNNING (1)
 
 struct thread_pool
 {
     int num_threads;
-    bool running;
+    bool state;
     queue_t * queue;
     pthread_t * pool;
     pthread_mutex_t thread_pool_lock;
@@ -42,7 +43,7 @@ thread_pool_initialize(int num_threads)
     }
     
     thread_pool->num_threads = num_threads;
-    thread_pool->running = true;
+    thread_pool->state = THREAD_POOL_RUNNING;
     thread_pool->pool = calloc(1, sizeof(pthread_t[num_threads]));
 
     for (int idx = 0; idx < num_threads; idx++)
@@ -60,5 +61,14 @@ thread_pool_initialize(int num_threads)
 
 void * thread_pool_job(void * arg)
 {
-
+    thread_pool_t * thread_pool = (thread_pool_t *)arg;
+    while (THREAD_POOL_RUNNING == thread_pool->state)
+    {
+        pthread_mutex_lock(&thread_pool->thread_pool_lock);
+        
+        
+        
+        
+        pthread_mutex_unlock(&thread_pool->thread_pool_lock);
+    }
 }

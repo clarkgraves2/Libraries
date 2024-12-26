@@ -8,7 +8,7 @@
 typedef struct thread_pool thread_pool_t;
 typedef struct thread_job thread_job_t;
 
-thread_pool_t thread_pool_initialize(int num_of_threads);
-thread_job_t thread_pool_create_job(void * (*job));
+thread_pool_t * thread_pool_initialize(int num_of_threads);
+thread_job_t * thread_pool_job(void * (*job_function));
 
 #endif THREAD_POOL_H
