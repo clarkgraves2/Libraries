@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #define THREAD_POOL_RUNNING (1)
+#define DEQUEUE_ERROR (-1)
 
 struct thread_pool
 {
@@ -63,13 +64,56 @@ void *
 thread_pool_job(void * arg)
 {
     thread_pool_t * thread_pool = (thread_pool_t *)arg;
+    
+    if (NULL == thread_pool) 
+    {
+        // Insert Error Log
+        return NULL;
+    }
+    
+    pthread_mutex_lock(&thread_pool->thread_pool_lock);
+    
     while (THREAD_POOL_RUNNING == thread_pool->state)
     {
-        pthread_mutex_lock(&thread_pool->thread_pool_lock);
+        while (queue_is_empty(thread_pool->queue) && 
+               THREAD_POOL_RUNNING == thread_pool->state) 
+        {
+            pthread_cond_wait(&thread_pool->signal, &thread_pool->thread_pool_lock);
+        }
+
+        if (THREAD_POOL_RUNNING != thread_pool->state) 
+        {
+            break;
+        }
+
+        void * item = NULL;
+        int dequeue_result = queue_dequeue(thread_pool->queue, &item);
         
+        if (dequeue_result == -1) 
+        {
+            // Log error 
+            pthread_mutex_unlock(&thread_pool->thread_pool_lock);
+            continue;
+        }
         
-        
+        thread_job_t *job = (thread_job_t *)item;
         
         pthread_mutex_unlock(&thread_pool->thread_pool_lock);
+        
+        if (job != NULL) 
+        {
+            if (job->thread_job != NULL) 
+            {
+                job->thread_job(job->arg);
+            }
+        
+            free(job);
+            job == NULL;
+        }
+        
+        pthread_mutex_lock(&thread_pool->thread_pool_lock);
     }
+    
+    pthread_mutex_unlock(&thread_pool->thread_pool_lock);
+    return NULL;
 }
