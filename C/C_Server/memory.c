@@ -136,7 +136,7 @@ memory_free(memory_tracker_t *tracker, void **ptr)
 void 
 memory_free_all(memory_tracker_t *tracker, void ***ptrs, size_t num_ptrs) 
 {
-    if (NULL == tracker || NULL == tracker->tracked_ptrs) 
+    if (NULL == tracker || NULL == tracker->tracked_ptrs || NULL == ptrs) 
     {
         return;
     }
@@ -151,14 +151,11 @@ memory_free_all(memory_tracker_t *tracker, void ***ptrs, size_t num_ptrs)
 
     tracker->count = 0;
 
-    if (ptrs != NULL) 
+    for (size_t i = 0; i < num_ptrs; i++) 
     {
-        for (size_t i = 0; i < num_ptrs; i++) 
+        if (ptrs[i] != NULL) 
         {
-            if (ptrs[i] != NULL) 
-            {
-                *(ptrs[i]) = NULL;
-            }
+            *(ptrs[i]) = NULL;
         }
     }
 }
@@ -166,7 +163,7 @@ memory_free_all(memory_tracker_t *tracker, void ***ptrs, size_t num_ptrs)
 void 
 memory_free_category(memory_tracker_t *tracker, mem_category_t category, void ***ptrs, size_t num_ptrs) 
 {
-    if (NULL == tracker || NULL == tracker->tracked_ptrs) 
+    if (NULL == tracker || NULL == tracker->tracked_ptrs || NULL == ptrs) 
     {
         return;
     }
@@ -197,15 +194,19 @@ memory_free_category(memory_tracker_t *tracker, mem_category_t category, void **
         }
     }
 
-    if (ptrs != NULL) 
+    for (size_t i = 0; i < num_ptrs; i++) 
     {
-        for (size_t i = 0; i < num_ptrs; i++) 
+        if (ptrs[i] != NULL && *(ptrs[i]) != NULL) 
         {
-            if (ptrs[i] != NULL) 
+            for (size_t j = 0; j < tracker->count; j++) 
             {
-                
-                *(ptrs[i]) = NULL;
+                if (*(ptrs[i]) == tracker->tracked_ptrs[j].ptr) 
+                {
+                    *(ptrs[i]) = NULL;
+                    break;
+                }
             }
         }
     }
+
 }
