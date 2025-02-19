@@ -35,8 +35,6 @@ destroy_queue (queue_t ** queue)
         return;
     }
 
-    // Free all nodes in the queue
-    //
     struct node * current = (*queue)->front;
 
     while (current != NULL)
@@ -46,8 +44,6 @@ destroy_queue (queue_t ** queue)
         free (temp);
     }
 
-    // Free the queue structure itself
-    //
     free (*queue);
     *queue = NULL;
 }
