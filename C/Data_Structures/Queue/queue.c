@@ -28,7 +28,7 @@ create_queue (void)
 }
 
 void
-destroy_queue (queue_t ** queue)
+queue_destroy (queue_t ** queue)
 {
     if (queue == NULL || *queue == NULL)
     {

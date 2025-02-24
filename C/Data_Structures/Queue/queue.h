@@ -28,7 +28,7 @@ queue_t * create_queue();
  * The pointer will be set to NULL after the queue is
  * destroyed.
  */
-void destroy_queue (queue_t **queue);
+void queue_destroy (queue_t **queue);
 
 int queue_enqueue (queue_t * queue, void * item);
 
