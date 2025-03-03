@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define INITIAL_QUEUE_SIZE 8
-#define ROOT_INDEX         0
+#define INITIAL_QUEUE_SIZE (8)
+#define ROOT_INDEX         (0)
 
 struct pqueue
 {
