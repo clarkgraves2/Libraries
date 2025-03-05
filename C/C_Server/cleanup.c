@@ -19,8 +19,8 @@
 /*************************************************************************
 * Includes
 *************************************************************************/
-#include "cleanup.h"
-#include "syslog.h"
+#include "../include/cleanup.h"
+#include "../include/syslog.h"
 #include <errno.h>
 #include <pthread.h>
 #include <stdlib.h>
