@@ -10,24 +10,22 @@
 
  #ifndef QUEUE_H
  #define QUEUE_H
-
+ 
  #include <stdbool.h>
+ #include <stdint.h>
  
  /*************************************************************************
- * Type Definitions
- *************************************************************************/
+  * Type Definitions
+  *************************************************************************/
  
- // @brief Opaque queue structure 
+ /* Opaque queue structure - implementation details hidden from users */
  typedef struct queue queue_t;
  
- // @brief Node structure for queue elements 
- typedef struct node node_t;
- 
  /*************************************************************************
- * Function Declarations 
- *************************************************************************/
+  * Function Declarations 
+  *************************************************************************/
  
- /** 
+ /*!
   * @brief Creates a new empty queue.
   *
   * @return Pointer to newly created queue or NULL if allocation fails
@@ -35,16 +33,16 @@
  queue_t * 
  queue_create(void);
  
- /** 
+ /*!
   * @brief Destroys a queue and frees all associated memory.
   *
   * @param[in,out] p_queue Double pointer to queue. Set to NULL after freeing.
-  * @return true on sucessful destroy, false on error.
+  * @return true on successful destroy, false on error.
   */
  bool 
- queue_destroy(queue_t ** p_queue);
+ queue_destroy(queue_t ** const p_queue);
  
- /** 
+ /*!
   * @brief Adds an item to the back of the queue.
   *
   * @param[in,out] p_queue The queue to add to
@@ -53,9 +51,9 @@
   * @return true on success, false on failure
   */
  bool 
- queue_enqueue(queue_t *p_queue, void *p_item);
+ queue_enqueue(queue_t * const p_queue, void * const p_item);
  
- /** 
+ /*!
   * @brief Removes and returns the item at front of queue.
   *
   * @param[in,out] p_queue The queue to remove from 
@@ -64,19 +62,19 @@
   * @return true on success, false on failure
   */
  bool 
- queue_dequeue(queue_t * p_queue, void ** pp_item);
+ queue_dequeue(queue_t * const p_queue, void ** const pp_item);
  
- /**
+ /*!
   * @brief Gets the current size of the queue.
   *
   * @param[in] p_queue The queue to check
   *
   * @return Current queue size, or -1 if queue is NULL
   */
- int 
- queue_size(queue_t *p_queue);
+ int32_t 
+ queue_size(queue_t * const p_queue);
  
- /**
+ /*!
   * @brief Checks if queue is empty.
   *
   * @param[in] p_queue The queue to check
@@ -84,7 +82,7 @@
   * @return true if empty or NULL, false otherwise
   */
  bool 
- queue_is_empty(queue_t *p_queue);
+ queue_is_empty(queue_t * const p_queue);
  
  #endif /* QUEUE_H */
  
