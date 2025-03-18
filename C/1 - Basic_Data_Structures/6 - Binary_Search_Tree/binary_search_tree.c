@@ -23,7 +23,7 @@
      
      if (NULL == p_node)
      {
-         return NULL;
+         return (NULL);
      }
      
      p_node->p_data = p_data;
@@ -31,7 +31,7 @@
      p_node->p_right = NULL;
      p_node->p_parent = NULL;
      
-     return p_node;
+     return (p_node);
  }
  
  /*!
@@ -47,7 +47,7 @@
  {
      if ((NULL == p_tree) || (NULL == p_tree->p_root) || (NULL == p_data))
      {
-         return NULL;
+         return (NULL);
      }
      
      bst_node_t *p_current = p_tree->p_root;
@@ -60,7 +60,7 @@
          if (0 == compare_result)
          {
              /* Found the node */
-             return p_current;
+             return (p_current);
          }
          else if (compare_result < 0)
          {
@@ -75,7 +75,7 @@
      }
      
      /* Node not found */
-     return NULL;
+     return (NULL);
  }
  
  /*!
@@ -90,7 +90,7 @@
  {
      if (NULL == p_node)
      {
-         return NULL;
+         return (NULL);
      }
      
      /* Traverse left until reaching the leftmost node */
@@ -101,7 +101,7 @@
          p_current = p_current->p_left;
      }
      
-     return p_current;
+     return (p_current);
  }
  
  /*!
@@ -116,7 +116,7 @@
  {
      if (NULL == p_node)
      {
-         return NULL;
+         return (NULL);
      }
      
      /* Traverse right until reaching the rightmost node */
@@ -127,7 +127,7 @@
          p_current = p_current->p_right;
      }
      
-     return p_current;
+     return (p_current);
  }
  
  /*!
@@ -234,6 +234,102 @@
  }
  
  /*!
+  * @brief Remove a node with no children from the binary search tree.
+  *
+  * @param[in,out] p_tree Pointer to the binary search tree.
+  * @param[in] p_node Node to be removed.
+  */
+ static void
+ remove_leaf_node(bst_t *p_tree, bst_node_t *p_node)
+ {
+     if (p_node == p_tree->p_root)
+     {
+         /* Root is the only node */
+         p_tree->p_root = NULL;
+     }
+     else
+     {
+         /* Update parent pointer */
+         if (p_node->p_parent->p_left == p_node)
+         {
+             p_node->p_parent->p_left = NULL;
+         }
+         else
+         {
+             p_node->p_parent->p_right = NULL;
+         }
+     }
+     
+     free(p_node);
+ }
+ 
+ /*!
+  * @brief Remove a node with only a right child from the binary search tree.
+  *
+  * @param[in,out] p_tree Pointer to the binary search tree.
+  * @param[in] p_node Node to be removed.
+  */
+ static void
+ remove_node_with_right_child(bst_t *p_tree, bst_node_t *p_node)
+ {
+     if (p_node == p_tree->p_root)
+     {
+         /* Update root */
+         p_tree->p_root = p_node->p_right;
+     }
+     else
+     {
+         /* Update parent pointer */
+         if (p_node->p_parent->p_left == p_node)
+         {
+             p_node->p_parent->p_left = p_node->p_right;
+         }
+         else
+         {
+             p_node->p_parent->p_right = p_node->p_right;
+         }
+     }
+     
+     /* Update child's parent pointer */
+     p_node->p_right->p_parent = p_node->p_parent;
+     
+     free(p_node);
+ }
+ 
+ /*!
+  * @brief Remove a node with only a left child from the binary search tree.
+  *
+  * @param[in,out] p_tree Pointer to the binary search tree.
+  * @param[in] p_node Node to be removed.
+  */
+ static void
+ remove_node_with_left_child(bst_t *p_tree, bst_node_t *p_node)
+ {
+     if (p_node == p_tree->p_root)
+     {
+         /* Update root */
+         p_tree->p_root = p_node->p_left;
+     }
+     else
+     {
+         /* Update parent pointer */
+         if (p_node->p_parent->p_left == p_node)
+         {
+             p_node->p_parent->p_left = p_node->p_left;
+         }
+         else
+         {
+             p_node->p_parent->p_right = p_node->p_left;
+         }
+     }
+     
+     /* Update child's parent pointer */
+     p_node->p_left->p_parent = p_node->p_parent;
+     
+     free(p_node);
+ }
+ 
+ /*!
   * @brief Initialize a binary search tree.
   *
   * @param[in,out] p_tree Pointer to the binary search tree to initialize.
@@ -246,14 +342,14 @@
  {
      if ((NULL == p_tree) || (NULL == compare_fn))
      {
-         return false;
+         return (false);
      }
      
      p_tree->p_root = NULL;
      p_tree->size = 0;
      p_tree->compare_fn = compare_fn;
      
-     return true;
+     return (true);
  }
  
  /*!
@@ -269,7 +365,7 @@
  {
      if ((NULL == p_tree) || (NULL == p_data))
      {
-         return false;
+         return (false);
      }
      
      /* Create a new node */
@@ -277,7 +373,7 @@
      
      if (NULL == p_new_node)
      {
-         return false;
+         return (false);
      }
      
      /* If the tree is empty, make the new node the root */
@@ -285,7 +381,7 @@
      {
          p_tree->p_root = p_new_node;
          p_tree->size = 1;
-         return true;
+         return (true);
      }
      
      /* Find the insertion point */
@@ -303,7 +399,7 @@
          {
              /* Duplicate data, free the new node and fail */
              free(p_new_node);
-             return false;
+             return (false);
          }
          else if (compare_result < 0)
          {
@@ -333,7 +429,7 @@
      
      p_tree->size++;
      
-     return true;
+     return (true);
  }
  
  /*!
@@ -351,10 +447,10 @@
      
      if (NULL != p_node)
      {
-         return p_node->p_data;
+         return (p_node->p_data);
      }
      
-     return NULL;
+     return (NULL);
  }
  
  /*!
@@ -370,7 +466,7 @@
  {
      if ((NULL == p_tree) || (NULL == p_tree->p_root) || (NULL == p_data))
      {
-         return NULL;
+         return (NULL);
      }
      
      /* Find the node to remove */
@@ -378,7 +474,7 @@
      
      if (NULL == p_node)
      {
-         return NULL;
+         return (NULL);
      }
      
      void *p_removed_data = p_node->p_data;
@@ -386,77 +482,17 @@
      /* Case 1: Node has no children */
      if ((NULL == p_node->p_left) && (NULL == p_node->p_right))
      {
-         if (p_node == p_tree->p_root)
-         {
-             /* Root is the only node */
-             p_tree->p_root = NULL;
-         }
-         else
-         {
-             /* Update parent pointer */
-             if (p_node->p_parent->p_left == p_node)
-             {
-                 p_node->p_parent->p_left = NULL;
-             }
-             else
-             {
-                 p_node->p_parent->p_right = NULL;
-             }
-         }
-         
-         free(p_node);
+         remove_leaf_node(p_tree, p_node);
      }
      /* Case 2: Node has only a right child */
      else if (NULL == p_node->p_left)
      {
-         if (p_node == p_tree->p_root)
-         {
-             /* Update root */
-             p_tree->p_root = p_node->p_right;
-         }
-         else
-         {
-             /* Update parent pointer */
-             if (p_node->p_parent->p_left == p_node)
-             {
-                 p_node->p_parent->p_left = p_node->p_right;
-             }
-             else
-             {
-                 p_node->p_parent->p_right = p_node->p_right;
-             }
-         }
-         
-         /* Update child's parent pointer */
-         p_node->p_right->p_parent = p_node->p_parent;
-         
-         free(p_node);
+         remove_node_with_right_child(p_tree, p_node);
      }
      /* Case 3: Node has only a left child */
      else if (NULL == p_node->p_right)
      {
-         if (p_node == p_tree->p_root)
-         {
-             /* Update root */
-             p_tree->p_root = p_node->p_left;
-         }
-         else
-         {
-             /* Update parent pointer */
-             if (p_node->p_parent->p_left == p_node)
-             {
-                 p_node->p_parent->p_left = p_node->p_left;
-             }
-             else
-             {
-                 p_node->p_parent->p_right = p_node->p_left;
-             }
-         }
-         
-         /* Update child's parent pointer */
-         p_node->p_left->p_parent = p_node->p_parent;
-         
-         free(p_node);
+         remove_node_with_left_child(p_tree, p_node);
      }
      /* Case 4: Node has both left and right children */
      else
@@ -478,7 +514,7 @@
      
      p_tree->size--;
      
-     return p_removed_data;
+     return (p_removed_data);
  }
  
  /*!
@@ -493,12 +529,12 @@
  {
      if ((NULL == p_tree) || (NULL == p_tree->p_root))
      {
-         return NULL;
+         return (NULL);
      }
      
      bst_node_t *p_min_node = find_min_node(p_tree->p_root);
      
-     return p_min_node->p_data;
+     return (p_min_node->p_data);
  }
  
  /*!
@@ -513,12 +549,12 @@
  {
      if ((NULL == p_tree) || (NULL == p_tree->p_root))
      {
-         return NULL;
+         return (NULL);
      }
      
      bst_node_t *p_max_node = find_max_node(p_tree->p_root);
      
-     return p_max_node->p_data;
+     return (p_max_node->p_data);
  }
  
  /*!
@@ -533,10 +569,10 @@
  {
      if (NULL == p_tree)
      {
-         return 0;
+         return (0);
      }
      
-     return p_tree->size;
+     return (p_tree->size);
  }
  
  /*!
@@ -551,7 +587,7 @@
  {
      if (NULL == p_tree)
      {
-         return true;
+         return (true);
      }
      
      return (0 == p_tree->size);

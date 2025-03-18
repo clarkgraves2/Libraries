@@ -51,7 +51,8 @@
   * 
   * @return true if initialization was successful, false otherwise.
   */
- bool bst_init(bst_t *p_tree, bst_compare_func_t compare_fn);
+ bool
+ bst_init(bst_t *p_tree, bst_compare_func_t compare_fn);
  
  /**
   * @brief Insert a new node into the binary search tree.
@@ -61,7 +62,8 @@
   *
   * @return true if the node was inserted successfully, false otherwise.
   */
- bool bst_insert(bst_t *p_tree, void *p_data);
+ bool
+ bst_insert(bst_t *p_tree, void *p_data);
  
  /**
   * @brief Search for a node in the binary search tree.
@@ -71,7 +73,8 @@
   *
   * @return Pointer to the found data, or NULL if not found.
   */
- void *bst_search(const bst_t *p_tree, const void *p_data);
+ void *
+ bst_search(const bst_t *p_tree, const void *p_data);
  
  /**
   * @brief Remove a node from the binary search tree.
@@ -81,7 +84,8 @@
   *
   * @return Pointer to the removed data, or NULL if not found.
   */
- void *bst_remove(bst_t *p_tree, const void *p_data);
+ void *
+ bst_remove(bst_t *p_tree, const void *p_data);
  
  /**
   * @brief Get the minimum value in the binary search tree.
@@ -90,7 +94,8 @@
   *
   * @return Pointer to the minimum data in the tree, or NULL if the tree is empty.
   */
- void *bst_find_min(const bst_t *p_tree);
+ void *
+ bst_find_min(const bst_t *p_tree);
  
  /**
   * @brief Get the maximum value in the binary search tree.
@@ -99,7 +104,8 @@
   *
   * @return Pointer to the maximum data in the tree, or NULL if the tree is empty.
   */
- void *bst_find_max(const bst_t *p_tree);
+ void *
+ bst_find_max(const bst_t *p_tree);
  
  /**
   * @brief Get the size of the binary search tree.
@@ -108,7 +114,8 @@
   *
   * @return Number of nodes in the binary search tree.
   */
- uint32_t bst_size(const bst_t *p_tree);
+ uint32_t
+ bst_size(const bst_t *p_tree);
  
  /**
   * @brief Check if the binary search tree is empty.
@@ -117,7 +124,8 @@
   *
   * @return true if the binary search tree is empty, false otherwise.
   */
- bool bst_is_empty(const bst_t *p_tree);
+ bool
+ bst_is_empty(const bst_t *p_tree);
  
  /**
   * @brief Inorder traversal of the binary search tree with callback function.
@@ -126,7 +134,8 @@
   * @param[in] callback Function called for each node during traversal.
   * @param[in,out] p_context Optional context pointer passed to the callback.
   */
- void bst_inorder_traversal(const bst_t *p_tree, void (*callback)(void *p_data, void *p_context), void *p_context);
+ void
+ bst_inorder_traversal(const bst_t *p_tree, void (*callback)(void *p_data, void *p_context), void *p_context);
  
  /**
   * @brief Preorder traversal of the binary search tree with callback function.
@@ -135,7 +144,8 @@
   * @param[in] callback Function called for each node during traversal.
   * @param[in,out] p_context Optional context pointer passed to the callback.
   */
- void bst_preorder_traversal(const bst_t *p_tree, void (*callback)(void *p_data, void *p_context), void *p_context);
+ void
+ bst_preorder_traversal(const bst_t *p_tree, void (*callback)(void *p_data, void *p_context), void *p_context);
  
  /**
   * @brief Postorder traversal of the binary search tree with callback function.
@@ -144,7 +154,8 @@
   * @param[in] callback Function called for each node during traversal.
   * @param[in,out] p_context Optional context pointer passed to the callback.
   */
- void bst_postorder_traversal(const bst_t *p_tree, void (*callback)(void *p_data, void *p_context), void *p_context);
+ void
+ bst_postorder_traversal(const bst_t *p_tree, void (*callback)(void *p_data, void *p_context), void *p_context);
  
  /**
   * @brief Clear the binary search tree, removing all nodes.
@@ -152,7 +163,8 @@
   * @param[in,out] p_tree Pointer to the binary search tree.
   * @param[in] b_free_data Flag indicating whether to free the data pointed to by each node.
   */
- void bst_clear(bst_t *p_tree, bool b_free_data);
+ void
+ bst_clear(bst_t *p_tree, bool b_free_data);
  
  /**
   * @brief Destroy the binary search tree, freeing all memory associated with it.
@@ -160,7 +172,8 @@
   * @param[in,out] p_tree Pointer to the binary search tree.
   * @param[in] b_free_data Flag indicating whether to free the data pointed to by each node.
   */
- void bst_destroy(bst_t *p_tree, bool b_free_data);
+ void
+ bst_destroy(bst_t *p_tree, bool b_free_data);
  
  #endif /* BINARY_SEARCH_TREE_H */
  /*** end of file ***/
