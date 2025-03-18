@@ -10,13 +10,38 @@
  #include <string.h>
  #include "heap.h"
  
- /*
-  * Macros for calculating parent, left child, and right child indices
-  * These macros are only used within this file
+ /*!
+  * @brief Calculate parent index for a given node index
+  *
+  * @param[in] idx Index of the node
+  * @return Index of the parent node
   */
- #define PARENT(i)      (((i) - 1) / 2)
- #define LEFT_CHILD(i)  (2 * (i) + 1)
- #define RIGHT_CHILD(i) (2 * (i) + 2)
+ static inline uint32_t get_parent_idx(uint32_t idx)
+ {
+     return ((idx) - 1) / 2;
+ }
+ 
+ /*!
+  * @brief Calculate left child index for a given node index
+  *
+  * @param[in] idx Index of the node
+  * @return Index of the left child node
+  */
+ static inline uint32_t get_left_child_idx(uint32_t idx)
+ {
+     return 2 * (idx) + 1;
+ }
+ 
+ /*!
+  * @brief Calculate right child index for a given node index
+  *
+  * @param[in] idx Index of the node
+  * @return Index of the right child node
+  */
+ static inline uint32_t get_right_child_idx(uint32_t idx)
+ {
+     return 2 * (idx) + 2;
+ }
  
  /*!
   * @brief Swap two elements in the heap.
@@ -25,8 +50,7 @@
   * @param[in] idx1 Index of the first element.
   * @param[in] idx2 Index of the second element.
   */
- static void
- swap_elements(heap_t *p_heap, uint32_t idx1, uint32_t idx2)
+ static void swap_elements(heap_t *p_heap, uint32_t idx1, uint32_t idx2)
  {
      void *p_temp = p_heap->pp_data[idx1];
      p_heap->pp_data[idx1] = p_heap->pp_data[idx2];
@@ -36,15 +60,18 @@
  /*!
   * @brief Heapify the subtree rooted at the given index.
   *
+  * This function maintains the min-heap property by recursively examining the subtree
+  * rooted at idx and swapping elements as needed to ensure that the parent is smaller
+  * than both of its children.
+  *
   * @param[in,out] p_heap Pointer to the heap.
   * @param[in] idx Index of the root of the subtree to heapify.
   */
- static void
- heapify_down(heap_t *p_heap, uint32_t idx)
+ static void heapify_down(heap_t *p_heap, uint32_t idx)
  {
      uint32_t smallest = idx;
-     uint32_t left = LEFT_CHILD(idx);
-     uint32_t right = RIGHT_CHILD(idx);
+     uint32_t left = get_left_child_idx(idx);
+     uint32_t right = get_right_child_idx(idx);
      
      /* Find the smallest among idx, left, and right */
      if ((left < p_heap->size) && 
@@ -70,22 +97,25 @@
  /*!
   * @brief Maintain the heap property after inserting a new element.
   *
+  * This function ensures that the min-heap property is maintained after inserting
+  * a new element by comparing the element with its parent and swapping if necessary,
+  * then recursively continuing up the tree.
+  *
   * @param[in,out] p_heap Pointer to the heap.
   * @param[in] idx Index of the element to heapify up.
   */
- static void
- heapify_up(heap_t *p_heap, uint32_t idx)
+ static void heapify_up(heap_t *p_heap, uint32_t idx)
  {
      /* If we are at the root or parent is smaller, we're done */
      if ((0 == idx) || 
-         (p_heap->compare_fn(p_heap->pp_data[PARENT(idx)], p_heap->pp_data[idx]) <= 0))
+         (p_heap->compare_fn(p_heap->pp_data[get_parent_idx(idx)], p_heap->pp_data[idx]) <= 0))
      {
          return;
      }
      
      /* Swap with parent and continue upward */
-     swap_elements(p_heap, idx, PARENT(idx));
-     heapify_up(p_heap, PARENT(idx));
+     swap_elements(p_heap, idx, get_parent_idx(idx));
+     heapify_up(p_heap, get_parent_idx(idx));
  }
  
  /*!
@@ -96,8 +126,7 @@
   *
   * @return true if the resize was successful, false otherwise.
   */
- static bool
- resize_heap(heap_t *p_heap, uint32_t new_capacity)
+ static bool resize_heap(heap_t *p_heap, uint32_t new_capacity)
  {
      bool result = false;
      
@@ -130,8 +159,7 @@
   * 
   * @return true if initialization was successful, false otherwise.
   */
- bool
- heap_init(heap_t *p_heap, uint32_t initial_capacity, float growth_factor, heap_compare_func_t compare_fn)
+ bool heap_init(heap_t *p_heap, uint32_t initial_capacity, float growth_factor, heap_compare_func_t compare_fn)
  {
      bool result = false;
      
@@ -175,8 +203,7 @@
   *
   * @return true if the element was inserted successfully, false otherwise.
   */
- bool
- heap_insert(heap_t *p_heap, void *p_data)
+ bool heap_insert(heap_t *p_heap, void *p_data)
  {
      bool result = false;
      
@@ -221,8 +248,7 @@
   *
   * @return Pointer to the data stored at the top of the heap, or NULL if the heap is empty.
   */
- void *
- heap_extract_top(heap_t *p_heap)
+ void *heap_extract_top(heap_t *p_heap)
  {
      void *p_top_data = NULL;
      
@@ -254,8 +280,7 @@
   *
   * @return Pointer to the data stored at the top of the heap, or NULL if the heap is empty.
   */
- void *
- heap_peek_top(const heap_t *p_heap)
+ void *heap_peek_top(const heap_t *p_heap)
  {
      void *p_top_data = NULL;
      
@@ -276,8 +301,7 @@
   *
   * @return Number of elements in the heap.
   */
- uint32_t
- heap_size(const heap_t *p_heap)
+ uint32_t heap_size(const heap_t *p_heap)
  {
      uint32_t size = 0;
      
@@ -296,8 +320,7 @@
   *
   * @return Current capacity of the heap.
   */
- uint32_t
- heap_capacity(const heap_t *p_heap)
+ uint32_t heap_capacity(const heap_t *p_heap)
  {
      uint32_t capacity = 0;
      
@@ -316,8 +339,7 @@
   *
   * @return true if the heap is empty, false otherwise.
   */
- bool
- heap_is_empty(const heap_t *p_heap)
+ bool heap_is_empty(const heap_t *p_heap)
  {
      bool b_is_empty = true;
      
@@ -337,8 +359,7 @@
   *
   * @return true if the capacity was ensured successfully, false otherwise.
   */
- bool
- heap_ensure_capacity(heap_t *p_heap, uint32_t min_capacity)
+ bool heap_ensure_capacity(heap_t *p_heap, uint32_t min_capacity)
  {
      bool result = false;
      
@@ -370,8 +391,7 @@
   *
   * @return true if the key was decreased successfully, false otherwise.
   */
- bool
- heap_decrease_key(heap_t *p_heap, uint32_t idx, void *p_new_data)
+ bool heap_decrease_key(heap_t *p_heap, uint32_t idx, void *p_new_data)
  {
      bool result = false;
      
@@ -406,8 +426,7 @@
   *
   * @return Pointer to the removed data, or NULL if the index is invalid.
   */
- void *
- heap_remove_at(heap_t *p_heap, uint32_t idx)
+ void *heap_remove_at(heap_t *p_heap, uint32_t idx)
  {
      void *p_removed_data = NULL;
      
@@ -431,7 +450,7 @@
          
          /* If the element didn't move down, it might need to move up */
          if ((idx > 0) && 
-             (p_heap->compare_fn(p_heap->pp_data[idx], p_heap->pp_data[PARENT(idx)]) < 0))
+             (p_heap->compare_fn(p_heap->pp_data[idx], p_heap->pp_data[get_parent_idx(idx)]) < 0))
          {
              heapify_up(p_heap, idx);
          }
@@ -446,8 +465,7 @@
   * @param[in,out] p_heap Pointer to the heap.
   * @param[in] b_free_data Flag indicating whether to free the data pointed to by each element.
   */
- void
- heap_clear(heap_t *p_heap, bool b_free_data)
+ void heap_clear(heap_t *p_heap, bool b_free_data)
  {
      if ((NULL == p_heap) || (NULL == p_heap->pp_data))
      {
@@ -469,6 +487,8 @@
      
      /* Reset the size, but keep the capacity */
      p_heap->size = 0;
+     
+     return;
  }
  
  /*!
@@ -477,8 +497,7 @@
   * @param[in,out] p_heap Pointer to the heap.
   * @param[in] b_free_data Flag indicating whether to free the data pointed to by each element.
   */
- void
- heap_destroy(heap_t *p_heap, bool b_free_data)
+ void heap_destroy(heap_t *p_heap, bool b_free_data)
  {
      if (NULL == p_heap)
      {
@@ -509,5 +528,7 @@
      p_heap->size = 0;
      p_heap->growth_factor = 0.0f;
      p_heap->compare_fn = NULL;
+     
+     return;
  }
  /*** end of file ***/
