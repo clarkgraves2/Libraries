@@ -48,6 +48,17 @@
  /**
   * @brief Initialize a hash table.
   *
+  * @details This function initializes a hash table with the specified capacity and load factor.
+  *          The user must provide callback functions for key operations:
+  *          - hash_function: Computes a hash code for a key
+  *          - key_equals: Checks if two keys are equal
+  *          - key_copy (optional): Creates a copy of a key
+  *          - key_free (optional): Frees resources associated with a key
+  *
+  *          For simple key types like integers, key_copy and key_free can be NULL.
+  *          For complex keys like strings, these functions should be provided to
+  *          properly manage memory.
+  *
   * @param[in,out] p_table Pointer to the hash table to initialize.
   * @param[in] initial_capacity Initial capacity of the hash table.
   * @param[in] load_factor Maximum ratio of size to capacity before resizing.
@@ -141,77 +152,11 @@
   */
  void hash_table_destroy(hash_table_t *p_table, bool b_free_values);
  
- /**
-  * @brief Standard hash function for string keys.
-  *
-  * @param[in] p_key Pointer to the string key (char *).
-  * @param[in] capacity Hash table capacity.
-  *
-  * @return Hash code for the string key.
+ /*
+  * NOTE: This basic implementation does not include pre-built callback functions for 
+  * specific key types. When using this hash table, you must provide your own callback
+  * functions based on your key type:
   */
- uint32_t hash_table_string_hash(const void *p_key, uint32_t capacity);
- 
- /**
-  * @brief Standard key equality function for string keys.
-  *
-  * @param[in] p_key1 Pointer to the first string key (char *).
-  * @param[in] p_key2 Pointer to the second string key (char *).
-  *
-  * @return true if the string keys are equal, false otherwise.
-  */
- bool hash_table_string_equals(const void *p_key1, const void *p_key2);
- 
- /**
-  * @brief Standard key copy function for string keys.
-  *
-  * @param[in] p_key Pointer to the string key (char *) to copy.
-  *
-  * @return Pointer to the new copy of the string key.
-  */
- void *hash_table_string_copy(const void *p_key);
- 
- /**
-  * @brief Standard key free function for string keys.
-  *
-  * @param[in] p_key Pointer to the string key (char *) to free.
-  */
- void hash_table_string_free(void *p_key);
- 
- /**
-  * @brief Standard hash function for integer keys.
-  *
-  * @param[in] p_key Pointer to the integer key (int *).
-  * @param[in] capacity Hash table capacity.
-  *
-  * @return Hash code for the integer key.
-  */
- uint32_t hash_table_int_hash(const void *p_key, uint32_t capacity);
- 
- /**
-  * @brief Standard key equality function for integer keys.
-  *
-  * @param[in] p_key1 Pointer to the first integer key (int *).
-  * @param[in] p_key2 Pointer to the second integer key (int *).
-  *
-  * @return true if the integer keys are equal, false otherwise.
-  */
- bool hash_table_int_equals(const void *p_key1, const void *p_key2);
- 
- /**
-  * @brief Standard key copy function for integer keys.
-  *
-  * @param[in] p_key Pointer to the integer key (int *) to copy.
-  *
-  * @return Pointer to the new copy of the integer key.
-  */
- void *hash_table_int_copy(const void *p_key);
- 
- /**
-  * @brief Standard key free function for integer keys.
-  *
-  * @param[in] p_key Pointer to the integer key (int *) to free.
-  */
- void hash_table_int_free(void *p_key);
  
  #endif /* HASH_TABLE_H */
  /*** end of file ***/
